@@ -3,14 +3,15 @@
     terminalika logo — a 3x3 snake board.
       [0 0 g]
       [r 0 g]
-      [0 g g]
-    g = snake body  (tcell.ColorGreen  #008000)
-    r = food        (tcell.ColorRed    #FF0000)
+      [0 H g]
+    g = snake body  (tcell.ColorGreen #008000)
+    H = snake head  (tcell.ColorLime  #00FF00, matches the in-game head)
+    r = food        (tcell.ColorRed   #FF0000)
     0 = empty
   -->
   <rect x="2" y="0" width="1" height="1" fill="#008000"/>
   <rect x="0" y="1" width="1" height="1" fill="#FF0000"/>
   <rect x="2" y="1" width="1" height="1" fill="#008000"/>
-  <rect x="1" y="2" width="1" height="1" fill="#008000"/>
+  <rect x="1" y="2" width="1" height="1" fill="#00FF00"/>
   <rect x="2" y="2" width="1" height="1" fill="#008000"/>
 </svg>

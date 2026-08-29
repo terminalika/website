@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 3" shape-rendering="crispEdges">
-  <!-- 3x3 snake board: [00g] [r0g] [0gg] — green #008000 (snake), red #FF0000 (food) -->
+  <!-- 3x3 snake board: [00g] [r0g] [0Hg] — green #008000 (body), lime #00FF00 (head), red #FF0000 (food) -->
   <rect x="2" y="0" width="1" height="1" fill="#008000"/>
   <rect x="0" y="1" width="1" height="1" fill="#FF0000"/>
   <rect x="2" y="1" width="1" height="1" fill="#008000"/>
-  <rect x="1" y="2" width="1" height="1" fill="#008000"/>
+  <rect x="1" y="2" width="1" height="1" fill="#00FF00"/>
   <rect x="2" y="2" width="1" height="1" fill="#008000"/>
 </svg>
