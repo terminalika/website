@@ -23,6 +23,13 @@ export default defineConfig({
 			expressiveCode: {
 				// Order matters for Starlight: [dark, light]; picked via data-theme.
 				themes: ['github-dark-default', 'github-light-default'],
+				// Wrap long lines instead of relying on horizontal scroll: fenced
+				// blocks in the docs (websocket payloads, jsonc configs with long
+				// trailing comments) have single lines wider than the content
+				// column, which otherwise overflow the frame on narrow viewports.
+				defaultProps: {
+					wrap: true,
+				},
 				styleOverrides: {
 					borderRadius: '0',
 					borderColor: 'var(--tk-border)',
