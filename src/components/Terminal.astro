@@ -15,16 +15,14 @@
  * `flag` package), so what you see here is what the real one says.
  */
 interface Props {
-	title?: string;
 	version?: string;
 }
-const { title = '~', version = 'v0.3.2' } = Astro.props;
+const { version = 'v0.3.2' } = Astro.props;
 ---
 
 <div class="tk-term not-content" data-version={version} data-mode="shell" tabindex="0" aria-label="Interactive terminal, only the terminalika command is available">
 	<div class="tk-term__bar">
-		<span class="tk-term__title">{title}</span>
-		<span class="tk-term__hint">try <kbd>terminalika</kbd> · Tab completes · Ctrl+L clears</span>
+		<span class="tk-term__hint">try <kbd>terminalika</kbd> · Tab completes</span>
 	</div>
 	<div class="tk-term__screen">
 		<div class="tk-term__out" aria-live="polite"></div>

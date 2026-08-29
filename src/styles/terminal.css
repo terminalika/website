@@ -254,6 +254,16 @@ body::before {
 .sl-markdown-content .sl-heading-wrapper {
 	--sl-anchor-icon-gap: 0.5em;
 }
+/* Starlight's hero padding-block runs up to 10rem top+bottom on desktop;
+   trim it down so the hero sits closer to the header and the terminal. */
+.hero {
+	padding-bottom: 0.5rem;
+}
+@media (min-width: 50rem) {
+	.hero {
+		padding-block: clamp(1rem, 4vmin, 3rem);
+	}
+}
 .hero h1 {
 	font-size: clamp(2rem, 6vw, 3.5rem);
 	font-weight: 700; /* bold, one step up from the top-bar logo */
@@ -606,7 +616,7 @@ dialog[aria-label] {
 .tk-term__bar {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
+	justify-content: flex-end;
 	gap: 0.75rem;
 	padding: 0.35rem 0.75rem;
 	border-bottom: 1px solid var(--tk-border);
@@ -614,10 +624,6 @@ dialog[aria-label] {
 	color: var(--tk-fg-dim);
 	font-size: 0.75rem;
 	user-select: none;
-}
-.tk-term__title::before {
-	content: '● ';
-	color: var(--tk-accent);
 }
 .tk-term__hint {
 	color: var(--tk-fg-faint);
