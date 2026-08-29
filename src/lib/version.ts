@@ -7,7 +7,7 @@
 // Last-known-good version, used only if the GitHub API is unreachable at
 // build time (offline dev, rate limiting, an outage). Bump it occasionally
 // so a failed fetch doesn't silently ship a very old fallback.
-const FALLBACK_VERSION = 'v0.3.3';
+const FALLBACK_VERSION = 'v0.3.4';
 
 async function fetchLatestVersion(): Promise<string> {
 	try {
