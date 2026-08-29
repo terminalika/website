@@ -38,8 +38,10 @@ driven by `data-theme` on `<html>`). To keep both modes complete:
 
 - Body, code, UI: `--tk-font-mono` (JetBrains Mono).
 - Logo (`.site-title`) and headings (h1–h4, hero, "On this page"):
-  `--tk-font-display` (Silkscreen, a pixel font). Never use it for body
-  text, tables or anything below ~0.85rem; it becomes unreadable.
+  `--tk-font-display` (Pixelify Sans, a pixel font). Logo is weight 600
+  and always lowercase; headings are weight 400 and keep the casing written
+  in the content. Never use it for body text, tables or anything below
+  ~1rem; it becomes unreadable.
 - Both fonts are self-hosted via Fontsource imports at the top of
   `terminal.css`; do not add Google Fonts `<link>`s.
 

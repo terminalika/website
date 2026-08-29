@@ -13,8 +13,7 @@
    ========================================================================== */
 
 @import '@fontsource-variable/jetbrains-mono';
-@import '@fontsource/silkscreen/400.css';
-@import '@fontsource/silkscreen/700.css';
+@import '@fontsource-variable/pixelify-sans';
 
 /* ---- 1. Palette tokens ------------------------------------------------- */
 
@@ -22,8 +21,8 @@
 :root {
 	--tk-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'Cascadia Code',
 		'Fira Code', Menlo, Consolas, monospace;
-	/* Pixel display face for the logo and headings only; never body text. */
-	--tk-font-display: 'Silkscreen', var(--tk-font-mono);
+	/* Pixel display face for the logo (600) and headings (400); never body text. */
+	--tk-font-display: 'Pixelify Sans Variable', 'Pixelify Sans', var(--tk-font-mono);
 	--tk-prompt: '$';
 	--tk-cursor: '▌';
 }
@@ -244,14 +243,13 @@ body::before {
 	-moz-osx-font-smoothing: unset;
 	text-rendering: optimizeSpeed;
 }
-/* Silkscreen renders large; pull sizes down a notch to keep line lengths sane.
-   Set through Starlight's tokens so the heading, its wrapper and the anchor
-   icon all agree on the size (a mismatch makes the icon overlap the text). */
+/* Heading sizes go through Starlight's tokens so the heading, its wrapper and
+   the anchor icon all agree (a mismatch makes the icon overlap the text). */
 :root {
-	--sl-text-h1: 1.9rem;
-	--sl-text-h2: 1.25rem;
-	--sl-text-h3: 1rem;
-	--sl-text-h4: 0.85rem;
+	--sl-text-h1: 2.2rem;
+	--sl-text-h2: 1.5rem;
+	--sl-text-h3: 1.2rem;
+	--sl-text-h4: 1rem;
 }
 .sl-markdown-content .sl-heading-wrapper {
 	--sl-anchor-icon-gap: 0.5em;
@@ -279,7 +277,7 @@ body::before {
 .right-sidebar h2 {
 	font-family: var(--tk-font-display);
 	font-weight: 400;
-	font-size: 0.85rem;
+	font-size: 1rem;
 	color: var(--tk-accent);
 	-webkit-font-smoothing: none;
 }
@@ -351,9 +349,10 @@ header.header {
 }
 .site-title {
 	font-family: var(--tk-font-display);
-	font-weight: 400;
-	font-size: 1.1rem;
-	letter-spacing: 0.04em;
+	font-weight: 600; /* semibold */
+	font-size: 1.35rem;
+	letter-spacing: 0.02em;
+	text-transform: lowercase;
 	color: var(--tk-accent);
 	-webkit-font-smoothing: none;
 	-moz-osx-font-smoothing: unset;

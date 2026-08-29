@@ -42,7 +42,7 @@ See `CLAUDE.md`. To add a palette, copy the `data-palette='amber'` blocks
 (dark + light) and set `data-palette` on `<html>`.
 
 Fonts (self-hosted via Fontsource): JetBrains Mono for everything,
-Silkscreen (pixel) for the logo and headings only.
+Pixelify Sans (pixel) for the logo (semibold, lowercase) and headings (regular).
 
 ## shell blocks
 
