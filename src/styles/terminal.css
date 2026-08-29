@@ -356,6 +356,7 @@ header.header {
 	color: var(--tk-accent);
 	-webkit-font-smoothing: none;
 	-moz-osx-font-smoothing: unset;
+	gap: 0.4rem; /* tighter than Starlight's default logo/title spacing */
 }
 /* The 3x3 snake-board logo takes the place of the shell prompt. */
 .site-title img {
@@ -363,12 +364,6 @@ header.header {
 	height: 1.35rem;
 	image-rendering: pixelated;
 	image-rendering: crisp-edges;
-}
-.site-title::after {
-	content: var(--tk-cursor);
-	color: var(--tk-accent);
-	animation: tk-blink 1.1s steps(1) infinite;
-	margin-left: 0.1em;
 }
 
 .sidebar-pane {
@@ -572,7 +567,6 @@ dialog[aria-label] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.site-title::after,
 	.tk-shell__cursor::after {
 		animation: none;
 	}
