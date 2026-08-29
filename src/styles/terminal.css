@@ -558,7 +558,12 @@ dialog[aria-label] {
 	content: '● ';
 	color: var(--tk-accent);
 }
-.tk-shell__replay {
+.tk-shell__actions {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+.tk-shell__btn {
 	appearance: none;
 	background: none;
 	border: 1px solid var(--tk-border);
@@ -567,7 +572,7 @@ dialog[aria-label] {
 	cursor: pointer;
 	padding: 0 0.4rem;
 }
-.tk-shell__replay:hover {
+.tk-shell__btn:hover {
 	color: var(--tk-accent);
 	border-color: var(--tk-accent-dim);
 }

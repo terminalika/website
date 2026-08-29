@@ -45,7 +45,10 @@ const { lines, title = 'terminal', prompt = '$', speed = 28, autoplay = true } =
 >
 	<div class="tk-shell__bar">
 		<span class="tk-shell__title">{title}</span>
-		<button class="tk-shell__replay" type="button" aria-label="Replay">↻ replay</button>
+		<div class="tk-shell__actions">
+			<button class="tk-shell__btn tk-shell__toggle" type="button" aria-label="Pause">⏸ pause</button>
+			<button class="tk-shell__btn tk-shell__copy" type="button" aria-label="Copy">⧉ copy</button>
+		</div>
 	</div>
 	{/* Whitespace inside the body collapses (white-space: normal); each line
 	    is display:block with white-space: pre, so JSX indentation never leaks
@@ -61,22 +64,42 @@ const { lines, title = 'terminal', prompt = '$', speed = 28, autoplay = true } =
 <script>
 	const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 	const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	// How long a finished shell sits before it types itself out again.
+	const LOOP_DELAY = 4000;
 
 	class ShellPlayer {
 		root: HTMLElement;
 		lines: HTMLElement[];
 		speed: number;
+		prompt: string;
 		run = 0;
+		paused = false;
+		// Resume position: index of the line currently being revealed, and how
+		// much of its text has been typed so far (only meaningful mid-typing).
+		pos = 0;
+		partial = '';
+		toggleBtn: HTMLButtonElement | null;
+		copyBtn: HTMLButtonElement | null;
 
 		constructor(root: HTMLElement) {
 			this.root = root;
 			this.lines = Array.from(root.querySelectorAll<HTMLElement>('.tk-shell__line'));
 			this.speed = Number(root.dataset.speed ?? 28);
-			root.querySelector('.tk-shell__replay')?.addEventListener('click', () => this.play());
+			this.prompt = root.dataset.prompt ?? '$';
+			// Lock the body to its server-rendered (i.e. fully revealed) height so
+			// hiding/typing lines during playback never reflows the page.
+			const body = root.querySelector<HTMLElement>('.tk-shell__body');
+			if (body) body.style.minHeight = `${body.getBoundingClientRect().height}px`;
+			this.toggleBtn = root.querySelector<HTMLButtonElement>('.tk-shell__toggle');
+			this.toggleBtn?.addEventListener('click', () => this.toggle());
+			this.copyBtn = root.querySelector<HTMLButtonElement>('.tk-shell__copy');
+			this.copyBtn?.addEventListener('click', () => this.copy());
 		}
 
 		reset() {
 			this.root.dataset.state = 'idle';
+			this.pos = 0;
+			this.partial = '';
 			for (const line of this.lines) {
 				// Hide explicitly: lines are revealed one by one in play().
 				line.style.display = 'none';
@@ -86,44 +109,108 @@ const { lines, title = 'terminal', prompt = '$', speed = 28, autoplay = true } =
 			}
 		}
 
+		setToggleLabel(label: 'pause' | 'continue') {
+			if (!this.toggleBtn) return;
+			this.toggleBtn.textContent = label === 'pause' ? '⏸ pause' : '▶ continue';
+			this.toggleBtn.setAttribute('aria-label', label === 'pause' ? 'Pause' : 'Continue');
+		}
+
+		toggle() {
+			if (this.paused) this.resume();
+			else this.pause();
+		}
+
+		pause() {
+			this.paused = true;
+			// Invalidate the in-flight play()/type() loop; whatever is on screen
+			// right now (including a half-typed line) stays exactly as is.
+			this.run++;
+			this.setToggleLabel('continue');
+		}
+
+		resume() {
+			this.paused = false;
+			this.setToggleLabel('pause');
+			// No reset(): play() picks up from this.pos / this.partial.
+			this.play();
+		}
+
+		async copy() {
+			const text = this.lines
+				.map((line) => {
+					const full = line.dataset.text ?? '';
+					return line.dataset.type === 'input' ? `${this.prompt} ${full}` : full;
+				})
+				.join('\n');
+			try {
+				await navigator.clipboard.writeText(text);
+			} catch {
+				return; // clipboard API unavailable or denied — nothing sensible to do
+			}
+			if (!this.copyBtn) return;
+			const original = this.copyBtn.textContent;
+			this.copyBtn.textContent = '✓ copied';
+			setTimeout(() => {
+				if (this.copyBtn) this.copyBtn.textContent = original;
+			}, 1200);
+		}
+
 		async play() {
 			const id = ++this.run;
-			this.reset();
 			this.root.dataset.state = 'playing';
-			for (const line of this.lines) {
+			for (; this.pos < this.lines.length; this.pos++) {
 				if (id !== this.run) return;
-				const delay = Number(line.dataset.delay ?? 0);
-				if (delay) await sleep(delay);
-				line.style.display = 'block';
+				const line = this.lines[this.pos];
+				const firstVisit = line.style.display !== 'block';
+				if (firstVisit) {
+					const delay = Number(line.dataset.delay ?? 0);
+					if (delay) await sleep(delay);
+					if (id !== this.run) return;
+					line.style.display = 'block';
+					this.partial = '';
+				}
 				if (line.dataset.type === 'input') {
-					await this.type(line, id);
+					const finished = await this.type(line, id);
+					if (!finished) return; // paused mid-type
 					await sleep(reduced ? 0 : 250);
 				} else {
 					await sleep(reduced ? 0 : 60);
 				}
+				if (id !== this.run) return;
 			}
-			if (id === this.run) {
-				this.lines.at(-1)?.classList.add('tk-shell__cursor');
-				this.root.dataset.state = 'done';
+			this.lines.at(-1)?.classList.add('tk-shell__cursor');
+			this.root.dataset.state = 'done';
+			// Loop: a one-shot animation nobody scrolls back to is pointless.
+			if (!reduced) {
+				await sleep(LOOP_DELAY);
+				if (id === this.run) {
+					this.reset();
+					this.play();
+				}
 			}
 		}
 
+		/** Types the line's remaining text. Returns false if paused mid-type. */
 		async type(line: HTMLElement, id: number) {
 			const target = line.querySelector<HTMLElement>('.tk-shell__text');
 			const full = line.dataset.text ?? '';
-			if (!target) return;
+			if (!target) return true;
+			if (this.partial === full) return true; // already fully typed before a pause
 			line.classList.add('tk-shell__cursor');
 			if (reduced) {
 				target.textContent = full;
+				this.partial = full;
 			} else {
-				target.textContent = '';
-				for (const ch of full) {
-					if (id !== this.run) return;
-					target.textContent += ch;
+				target.textContent = this.partial;
+				while (this.partial.length < full.length) {
+					if (id !== this.run) return false;
+					this.partial = full.slice(0, this.partial.length + 1);
+					target.textContent = this.partial;
 					await sleep(this.speed + Math.random() * this.speed * 0.6);
 				}
 			}
 			line.classList.remove('tk-shell__cursor');
+			return true;
 		}
 	}
 
@@ -134,7 +221,8 @@ const { lines, title = 'terminal', prompt = '$', speed = 28, autoplay = true } =
 				if (!entry.isIntersecting) continue;
 				const el = entry.target as HTMLElement;
 				observer.unobserve(el);
-				players.get(el)?.play();
+				const player = players.get(el);
+				if (player && !player.paused) player.play();
 			}
 		},
 		{ threshold: 0.4 }
