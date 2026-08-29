@@ -11,6 +11,7 @@ export default defineConfig({
 			description:
 				'A tiny terminal game launcher for developers who want something nostalgic to do while their AI agents are working.',
 			favicon: '/favicon.svg',
+			logo: { src: './src/assets/logo.svg', alt: '' },
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/terminalika/terminalika' },
 			],

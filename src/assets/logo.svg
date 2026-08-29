@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 3" width="96" height="96" shape-rendering="crispEdges">
+  <!--
+    terminalika logo — a 3x3 snake board.
+      [0 0 g]
+      [r 0 g]
+      [0 g g]
+    g = snake body  (tcell.ColorGreen  #008000)
+    r = food        (tcell.ColorRed    #FF0000)
+    0 = empty
+  -->
+  <rect x="2" y="0" width="1" height="1" fill="#008000"/>
+  <rect x="0" y="1" width="1" height="1" fill="#FF0000"/>
+  <rect x="2" y="1" width="1" height="1" fill="#008000"/>
+  <rect x="1" y="2" width="1" height="1" fill="#008000"/>
+  <rect x="2" y="2" width="1" height="1" fill="#008000"/>
+</svg>

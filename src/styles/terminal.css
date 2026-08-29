@@ -358,9 +358,12 @@ header.header {
 	-webkit-font-smoothing: none;
 	-moz-osx-font-smoothing: unset;
 }
-.site-title::before {
-	content: var(--tk-prompt) ' ';
-	color: var(--tk-fg-faint);
+/* The 3x3 snake-board logo takes the place of the shell prompt. */
+.site-title img {
+	width: 1.35rem;
+	height: 1.35rem;
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
 }
 .site-title::after {
 	content: var(--tk-cursor);

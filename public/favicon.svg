@@ -1,5 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" fill="#0b0e0c"/>
-  <rect x="1.5" y="1.5" width="29" height="29" fill="none" stroke="#23301f" stroke-width="1"/>
-  <text x="5" y="22" font-family="JetBrains Mono, Menlo, monospace" font-size="16" font-weight="700" fill="#5af78e">&gt;_</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 3" shape-rendering="crispEdges">
+  <!-- 3x3 snake board: [00g] [r0g] [0gg] — green #008000 (snake), red #FF0000 (food) -->
+  <rect x="2" y="0" width="1" height="1" fill="#008000"/>
+  <rect x="0" y="1" width="1" height="1" fill="#FF0000"/>
+  <rect x="2" y="1" width="1" height="1" fill="#008000"/>
+  <rect x="1" y="2" width="1" height="1" fill="#008000"/>
+  <rect x="2" y="2" width="1" height="1" fill="#008000"/>
 </svg>
