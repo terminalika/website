@@ -20,11 +20,12 @@ func runMenu(screen tcell.Screen, gamesList []string) (string, bool) {
 		s.Clear()
 		w, h := s.Size()
 
-		titleStyle := tcell.StyleDefault.Foreground(tcell.ColorAqua).Bold(true)
+		titleStyle := tcell.StyleDefault.Foreground(tcell.ColorGreen).Bold(true)
 		subtitleStyle := tcell.StyleDefault.Foreground(tcell.ColorGray)
 		itemStyle := tcell.StyleDefault.Foreground(tcell.ColorWhite)
 		selectedStyle := tcell.StyleDefault.Foreground(tcell.ColorBlack).Background(tcell.ColorAqua)
 
+		drawLogo(s, w/2-logoWidth/2, h/2-8)
 		emitCentered(s, w/2, h/2-4, titleStyle, "TERMINALIKA")
 		emitCentered(s, w/2, h/2-3, subtitleStyle, "select a game")
 
@@ -83,5 +84,46 @@ func emitCentered(s tcell.Screen, centerX, y int, style tcell.Style, str string)
 	for _, r := range str {
 		s.SetContent(x, y, r, nil, style)
 		x++
+	}
+}
+
+// logoCellWidth/logoSize/logoWidth describe the terminalika logo: a 3x3
+// snake board -
+//
+//	[0 0 g]
+//	[r 0 g]
+//	[0 H g]
+//
+// g = snake body (green), H = snake head (lime), r = food (red), 0 = empty -
+// kept in sync with internal/menu/menu.go in terminalika/terminalika and
+// logo.svg/favicon.svg here. Each logical pixel is drawn two columns wide so
+// it reads roughly square in a terminal cell grid.
+const (
+	logoCellWidth = 2
+	logoSize      = 3
+	logoWidth     = logoSize * logoCellWidth
+)
+
+type logoPixel struct {
+	x, y  int
+	color tcell.Color
+}
+
+var logoPixels = []logoPixel{
+	{2, 0, tcell.ColorGreen},
+	{0, 1, tcell.ColorRed},
+	{2, 1, tcell.ColorGreen},
+	{1, 2, tcell.ColorLime},
+	{2, 2, tcell.ColorGreen},
+}
+
+// drawLogo draws the terminalika logo with its top-left corner at (x, y).
+func drawLogo(s tcell.Screen, x, y int) {
+	for _, p := range logoPixels {
+		style := tcell.StyleDefault.Background(p.color)
+		px, py := x+p.x*logoCellWidth, y+p.y
+		for i := 0; i < logoCellWidth; i++ {
+			s.SetContent(px+i, py, ' ', nil, style)
+		}
 	}
 }
