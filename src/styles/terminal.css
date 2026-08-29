@@ -586,6 +586,118 @@ dialog[aria-label] {
 	display: none;
 }
 
+/* ---- 6b. Interactive terminal (src/components/Terminal.astro) ---------- */
+.tk-term {
+	position: relative;
+	margin: 1.5rem 0;
+	border: 1px solid var(--tk-border);
+	background: var(--tk-bg-panel);
+	color: var(--tk-fg);
+	font-family: var(--tk-font-mono);
+	font-size: 0.875rem;
+	line-height: 1.6;
+	cursor: text;
+	outline: none;
+}
+.tk-term.is-focused {
+	border-color: var(--tk-accent-dim);
+	box-shadow: 0 0 0 3px var(--tk-accent-glow);
+}
+.tk-term__bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	padding: 0.35rem 0.75rem;
+	border-bottom: 1px solid var(--tk-border);
+	background: var(--tk-bg-panel-2);
+	color: var(--tk-fg-dim);
+	font-size: 0.75rem;
+	user-select: none;
+}
+.tk-term__title::before {
+	content: '● ';
+	color: var(--tk-accent);
+}
+.tk-term__hint {
+	color: var(--tk-fg-faint);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.tk-term__hint kbd {
+	font: inherit;
+	color: var(--tk-fg-dim);
+}
+.tk-term__screen {
+	position: relative;
+	padding: 0.9rem 1rem;
+	max-height: 22rem;
+	overflow-y: auto;
+}
+.tk-term__out {
+	white-space: pre;
+	overflow-x: auto;
+}
+.tk-term__row {
+	min-height: 1.6em;
+}
+.tk-term__row--input {
+	color: var(--tk-fg);
+}
+.tk-term__row--output {
+	color: var(--tk-fg-dim);
+}
+.tk-term__row--muted {
+	color: var(--tk-fg-faint);
+}
+.tk-term__row--ok {
+	color: var(--tk-accent);
+}
+.tk-term__row--warn {
+	color: var(--tk-warn);
+}
+.tk-term__row--error {
+	color: var(--tk-error);
+}
+.tk-term__line {
+	white-space: pre;
+}
+.tk-term__prompt {
+	color: var(--tk-accent);
+	margin-right: 0.6ch;
+}
+.tk-term__ghost {
+	color: var(--tk-fg-faint);
+}
+.tk-term__cursor::after {
+	content: var(--tk-cursor);
+	color: var(--tk-accent);
+	margin-left: -0.15ch;
+	margin-right: -0.55ch;
+	opacity: 0.4;
+}
+.tk-term.is-focused .tk-term__cursor::after {
+	opacity: 1;
+	animation: tk-blink 1s steps(1) infinite;
+}
+/* The real <input> stays in the flow (so mobile keyboards open) but invisible. */
+.tk-term__input {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	background: transparent;
+	color: transparent;
+	caret-color: transparent;
+	font: inherit;
+	cursor: text;
+}
+
 @keyframes tk-blink {
 	50% {
 		opacity: 0;

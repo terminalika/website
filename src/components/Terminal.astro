@@ -1,0 +1,331 @@
+---
+/**
+ * <Terminal> — an interactive fake shell that only knows `terminalika`.
+ *
+ *  - type: inline ghost text suggests the completion; Tab / → accepts it,
+ *    Tab with several candidates lists them (bash style);
+ *  - Enter runs the line; ↑/↓ walk history; Ctrl+L clears; Ctrl+C cancels;
+ *  - anything that isn't `terminalika` is rejected with "command not found".
+ *
+ * The command's behaviour (flags, errors, menu, game screens) mirrors the
+ * real binary as closely as a static page can.
+ */
+interface Props {
+	title?: string;
+	version?: string;
+}
+const { title = '~', version = 'v0.3.2' } = Astro.props;
+---
+
+<div class="tk-term not-content" data-version={version} tabindex="0" aria-label="Interactive terminal, only the terminalika command is available">
+	<div class="tk-term__bar">
+		<span class="tk-term__title">{title}</span>
+		<span class="tk-term__hint">try <kbd>terminalika</kbd> · Tab completes · Ctrl+L clears</span>
+	</div>
+	<div class="tk-term__screen">
+		<div class="tk-term__out" aria-live="polite"></div>
+		<div class="tk-term__line">
+			<span class="tk-term__prompt">$</span>
+			<span class="tk-term__typed"></span>
+			<span class="tk-term__cursor"></span>
+			<span class="tk-term__ghost"></span>
+		</div>
+		<input class="tk-term__input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="command input" />
+	</div>
+</div>
+
+<script>
+	type Kind = 'input' | 'output' | 'ok' | 'warn' | 'error' | 'muted';
+
+	const GAMES = ['invaders', 'pong', 'snake', 'tetris'] as const;
+	type Game = (typeof GAMES)[number];
+
+	/** Flags exactly as the Go binary defines them (alphabetical, like `flag` prints them). */
+	const FLAGS: Record<string, { type: 'bool' | 'string'; help: string; def?: string }> = {
+		claude: { type: 'bool', help: 'subscribe to the latest Claude Code session and pause the game when the agent settles' },
+		game: { type: 'string', help: `skip the menu and launch a game directly (${GAMES.join(', ')})` },
+		pi: { type: 'bool', help: 'subscribe to the latest pi session and pause the game when the agent settles' },
+		version: { type: 'bool', help: 'print the version and exit' },
+		ws: { type: 'string', help: 'WebSocket base address for events/commands (empty disables)', def: '127.0.0.1:8080' },
+	};
+
+	const COMPLETIONS = [
+		'--game=invaders',
+		'--game=pong',
+		'--game=snake',
+		'--game=tetris',
+		'--claude',
+		'--pi',
+		'--ws=',
+		'--version',
+		'-h',
+	];
+
+	class Term {
+		root: HTMLElement;
+		out: HTMLElement;
+		typed: HTMLElement;
+		ghost: HTMLElement;
+		input: HTMLInputElement;
+		version: string;
+		history: string[] = [];
+		histIdx = -1;
+		draft = '';
+
+		constructor(root: HTMLElement) {
+			this.root = root;
+			this.out = root.querySelector('.tk-term__out')!;
+			this.typed = root.querySelector('.tk-term__typed')!;
+			this.ghost = root.querySelector('.tk-term__ghost')!;
+			this.input = root.querySelector('.tk-term__input')!;
+			this.version = root.dataset.version ?? 'dev';
+
+			root.addEventListener('click', () => this.input.focus());
+			root.addEventListener('focus', () => this.input.focus());
+			this.input.addEventListener('input', () => this.render());
+			this.input.addEventListener('keydown', (e) => this.key(e));
+			this.input.addEventListener('focus', () => root.classList.add('is-focused'));
+			this.input.addEventListener('blur', () => root.classList.remove('is-focused'));
+
+			this.print('muted', `terminalika ${this.version} · a shell that only knows one command`);
+			this.print('muted', 'type terminalika, press Tab to complete, Enter to run.');
+			this.render();
+		}
+
+		/* ---- rendering ------------------------------------------------- */
+
+		render() {
+			this.typed.textContent = this.input.value;
+			this.ghost.textContent = this.suggestion(this.input.value);
+		}
+
+		print(kind: Kind, text = '') {
+			const line = document.createElement('div');
+			line.className = `tk-term__row tk-term__row--${kind}`;
+			line.textContent = text;
+			this.out.append(line);
+			this.out.scrollTop = this.out.scrollHeight;
+		}
+
+		echo(cmd: string) {
+			const line = document.createElement('div');
+			line.className = 'tk-term__row tk-term__row--input';
+			const p = document.createElement('span');
+			p.className = 'tk-term__prompt';
+			p.textContent = '$';
+			line.append(p, document.createTextNode(' ' + cmd));
+			this.out.append(line);
+		}
+
+		/* ---- completion ------------------------------------------------ */
+
+		/** Candidates for the last word of the current line. */
+		candidates(line: string): string[] {
+			const words = line.split(/\s+/);
+			const last = words[words.length - 1] ?? '';
+			const first = words[0] ?? '';
+
+			if (words.length === 1) {
+				return 'terminalika'.startsWith(last) && last !== 'terminalika' ? ['terminalika'] : [];
+			}
+			if (first !== 'terminalika') return [];
+
+			// --game=sn → --game=snake ; --g → --game= ; -- → all flags
+			const norm = last.startsWith('--') ? last : last.startsWith('-') && last.length > 1 && last !== '-h' ? '-' + last : last;
+			const used = new Set(words.slice(1, -1).map((w) => w.replace(/^-+/, '').split('=')[0]));
+			return COMPLETIONS.filter((c) => {
+				const name = c.replace(/^-+/, '').split('=')[0];
+				if (used.has(name) && !last.startsWith('--game=')) return false;
+				return c.startsWith(norm) && c !== last;
+			});
+		}
+
+		suggestion(line: string): string {
+			if (line.endsWith(' ') && line.trim() === 'terminalika') return '--game=snake';
+			if (line === '') return '';
+			const c = this.candidates(line);
+			if (!c.length) return '';
+			const last = line.split(/\s+/).pop() ?? '';
+			return c[0].slice(last.length);
+		}
+
+		accept() {
+			const line = this.input.value;
+			if (line.endsWith(' ') && line.trim() === 'terminalika') {
+				this.input.value = line + '--game=snake';
+			} else {
+				const c = this.candidates(line);
+				if (c.length === 1) {
+					this.input.value = line.replace(/\S*$/, c[0]);
+				} else if (c.length > 1) {
+					const prefix = commonPrefix(c);
+					const last = line.split(/\s+/).pop() ?? '';
+					if (prefix.length > last.length) {
+						this.input.value = line.replace(/\S*$/, prefix);
+					} else {
+						this.echo(line);
+						this.print('muted', c.join('  '));
+					}
+				}
+			}
+			// A completed bool flag or command wants a space after it.
+			if (/^terminalika$|--claude$|--pi$|--version$|-h$|--game=\w+$/.test(this.input.value)) this.input.value += ' ';
+			this.render();
+		}
+
+		/* ---- keys ------------------------------------------------------ */
+
+		key(e: KeyboardEvent) {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				this.run(this.input.value);
+				this.input.value = '';
+				this.histIdx = -1;
+				this.render();
+			} else if (e.key === 'Tab' || (e.key === 'ArrowRight' && this.input.selectionStart === this.input.value.length && this.ghost.textContent)) {
+				e.preventDefault();
+				this.accept();
+			} else if (e.key === 'ArrowUp') {
+				e.preventDefault();
+				if (!this.history.length) return;
+				if (this.histIdx === -1) this.draft = this.input.value;
+				this.histIdx = Math.min(this.histIdx + 1, this.history.length - 1);
+				this.input.value = this.history[this.history.length - 1 - this.histIdx];
+				this.render();
+			} else if (e.key === 'ArrowDown') {
+				e.preventDefault();
+				if (this.histIdx === -1) return;
+				this.histIdx--;
+				this.input.value = this.histIdx === -1 ? this.draft : this.history[this.history.length - 1 - this.histIdx];
+				this.render();
+			} else if (e.ctrlKey && e.key.toLowerCase() === 'l') {
+				e.preventDefault();
+				this.out.replaceChildren();
+			} else if (e.ctrlKey && e.key.toLowerCase() === 'c') {
+				e.preventDefault();
+				this.echo(this.input.value + '^C');
+				this.input.value = '';
+				this.histIdx = -1;
+				this.render();
+			}
+		}
+
+		/* ---- the one command ------------------------------------------- */
+
+		run(raw: string) {
+			const line = raw.trim();
+			this.echo(raw);
+			if (!line) return;
+			this.history.push(line);
+
+			const argv = line.split(/\s+/);
+			const cmd = argv[0];
+			if (cmd !== 'terminalika') {
+				this.print('error', `sh: ${cmd}: command not found`);
+				this.print('muted', 'only one command lives here: terminalika  (try: terminalika -h)');
+				return;
+			}
+			this.terminalika(argv.slice(1));
+		}
+
+		terminalika(args: string[]) {
+			// Go `flag` parsing: -x, --x, -x=v, --x v (string flags only).
+			const opts: Record<string, string | boolean> = {};
+			for (let i = 0; i < args.length; i++) {
+				const a = args[i];
+				if (!a.startsWith('-')) {
+					// Positional args are ignored by flag.Parse; the binary ignores them too.
+					continue;
+				}
+				if (a === '-h' || a === '--help' || a === '-help') return this.usage();
+				const body = a.replace(/^-{1,2}/, '');
+				const eq = body.indexOf('=');
+				const name = eq === -1 ? body : body.slice(0, eq);
+				const spec = FLAGS[name];
+				if (!spec) {
+					this.print('error', `flag provided but not defined: -${name}`);
+					return this.usage();
+				}
+				if (spec.type === 'bool') {
+					if (eq !== -1) {
+						const v = body.slice(eq + 1);
+						if (!/^(true|false|1|0|t|f)$/i.test(v)) {
+							this.print('error', `invalid boolean value "${v}" for -${name}: parse error`);
+							return this.usage();
+						}
+						opts[name] = /^(true|1|t)$/i.test(v);
+					} else opts[name] = true;
+				} else {
+					if (eq !== -1) opts[name] = body.slice(eq + 1).replace(/^"(.*)"$/, '$1');
+					else if (i + 1 < args.length) opts[name] = args[++i].replace(/^"(.*)"$/, '$1');
+					else {
+						this.print('error', `flag needs an argument: -${name}`);
+						return this.usage();
+					}
+				}
+			}
+
+			if (opts.version) return this.print('output', this.version);
+
+			const game = opts.game as string | undefined;
+			if (game !== undefined && !GAMES.includes(game as Game)) {
+				this.print('error', `unknown game "${game}"; available games: [${GAMES.join(' ')}]`);
+				return;
+			}
+
+			const ws = 'ws' in opts ? (opts.ws as string) : '127.0.0.1:8080';
+			const watching = [opts.claude && 'Claude Code', opts.pi && 'pi'].filter(Boolean) as string[];
+
+			if (game === undefined) return this.menu(ws, watching);
+			this.game(game as Game, ws, watching);
+		}
+
+		usage() {
+			this.print('output', 'Usage of terminalika:');
+			for (const [name, f] of Object.entries(FLAGS)) {
+				this.print('output', `  -${name}${f.type === 'string' ? ' string' : ''}`);
+				this.print('output', `    \t${f.help}${f.def ? ` (default "${f.def}")` : ''}`);
+			}
+		}
+
+		menu(ws: string, watching: string[]) {
+			this.print('output', '');
+			this.print('ok', `  terminalika ${this.version}`);
+			this.print('output', '');
+			GAMES.forEach((g, i) => this.print(i === 2 ? 'ok' : 'output', `  ${i === 2 ? '>' : ' '} ${g}`));
+			this.print('output', '');
+			this.print('muted', '  ↑/↓ select · ENTER start · ESC quit');
+			this.footer(ws, watching);
+		}
+
+		game(game: Game, ws: string, watching: string[]) {
+			const frames: Record<Game, string[]> = {
+				snake: ['┌──────────────────────┐', '│ ▓▓▓▓▓▓▓▓▓▓▓          │', '│          ▓     ●     │', '│          ▓▓▓▓        │', '└──────────────────────┘'],
+				tetris: ['┌──────────┐', '│    ▓▓    │', '│    ▓▓    │', '│ ▓▓▓▓ ▓▓▓▓│', '│▓▓▓▓▓▓▓▓ ▓│', '└──────────┘'],
+				invaders: ['┌──────────────────────┐', '│  ▚▞ ▚▞ ▚▞ ▚▞ ▚▞ ▚▞   │', '│   ▚▞ ▚▞ ▚▞ ▚▞ ▚▞     │', '│           |          │', '│          ▟█▙         │', '└──────────────────────┘'],
+				pong: ['┌──────────────────────┐', '│▌         ·          ▐│', '│▌      ●             ▐│', '│          ·           │', '└──────────────────────┘'],
+			};
+			this.print('output', '');
+			for (const row of frames[game]) this.print('ok', '  ' + row);
+			this.print('output', '');
+			if (watching.length) this.print('warn', `  Paused by ${watching.includes('Claude Code') ? 'Claude' : 'PI'}   (SPACE resume)`);
+			this.print('muted', `  ${game} · ESC menu · R reset · SPACE pause`);
+			this.footer(ws, watching);
+		}
+
+		footer(ws: string, watching: string[]) {
+			this.print('output', '');
+			this.print('muted', ws ? `  sidecar: ws://${ws}  (ws.json in the config dir)` : '  sidecar: disabled');
+			if (watching.length) this.print('muted', `  watching: ${watching.join(' + ')} → pauses when the agent settles`);
+			this.print('muted', '  this is a preview — install the real thing: /install');
+		}
+	}
+
+	function commonPrefix(list: string[]): string {
+		let p = list[0] ?? '';
+		for (const s of list) while (!s.startsWith(p)) p = p.slice(0, -1);
+		return p;
+	}
+
+	for (const el of document.querySelectorAll<HTMLElement>('.tk-term')) new Term(el);
+</script>

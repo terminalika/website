@@ -50,5 +50,9 @@ driven by `data-theme` on `<html>`). To keep both modes complete:
 - Pages are lowercase, terminal-style (`flags`, `config.json`, `zellij`).
 - Shell demos use `<Shell lines={[...]} />` from `src/components/Shell.astro`,
   never screenshots.
+- The home page has a real interactive shell (`src/components/Terminal.astro`)
+  that only knows `terminalika`. Its `FLAGS` table and error strings mirror
+  the Go binary (`main.go` flag definitions, Go `flag` package messages);
+  when a flag is added or renamed in the launcher, update it there too.
 - The launcher's warning screens link to `/terminals`, `/terminals/zellij`
   and `/terminals/tmux`; keep those routes stable.

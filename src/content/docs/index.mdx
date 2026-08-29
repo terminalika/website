@@ -15,24 +15,9 @@ hero:
       variant: minimal
 ---
 
-import Shell from '../../components/Shell.astro';
+import Terminal from '../../components/Terminal.astro';
 
-<Shell
-	title="~/my-project"
-	lines={[
-		{ type: 'comment', text: '# start Snake, pause automatically when Claude Code finishes a turn' },
-		{ type: 'input', text: 'terminalika --game=snake -claude' },
-		{ type: 'output', text: '', delay: 300 },
-		{ type: 'output', text: '   ┌────────────────────────────┐' },
-		{ type: 'output', text: '   │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓            │' },
-		{ type: 'output', text: '   │      ●             ▓▓▓     │' },
-		{ type: 'output', text: '   │                            │' },
-		{ type: 'output', text: '   │        Paused by Claude    │' },
-		{ type: 'output', text: '   └────────────────────────────┘' },
-		{ type: 'output', text: '' },
-		{ type: 'ok', text: 'score 140  ·  best 310  ·  SPACE resume  ·  ESC menu', delay: 400 },
-	]}
-/>
+<Terminal title="~/my-project" version="v0.3.2" />
 
 ## what it is
 

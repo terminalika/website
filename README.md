@@ -25,6 +25,7 @@ src/
 │   └── development.md
 ├── components/
 │   ├── Shell.astro       # animated fake terminal (<Shell lines={[...]} />)
+│   ├── Terminal.astro    # interactive shell on the home page; only `terminalika` exists
 │   └── Empty.astro       # renders nothing; used to drop Starlight's theme toggle
 └── styles/terminal.css   # the whole look; palette tokens at the top
 ```
