@@ -70,6 +70,9 @@ driven by `data-theme` on `<html>`). To keep both modes complete:
   relayed as a release (meta=true) so held keys feel right.
 - Theme-rule exception: the game canvas (`.tk-term__game`) shows whatever
   colours the Go program paints, like a real terminal; those come from the
-  wasm, not from CSS, so the rule still holds for the stylesheet.
+  wasm, not from CSS, so the rule still holds for the stylesheet. The
+  canvas itself is transparent: tcell's web screen sends StyleDefault cells
+  as black-on-#e5e5e5, and the glue maps that pair (plus plain white text)
+  to "inherit", so default text follows `--tk-fg` in both modes.
 - The launcher's warning screens link to `/terminals`, `/terminals/zellij`
   and `/terminals/tmux`; keep those routes stable.

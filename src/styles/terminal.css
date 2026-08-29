@@ -668,6 +668,10 @@ dialog[aria-label] {
 	white-space: pre;
 	user-select: none;
 	cursor: default;
+	/* Default cells are transparent and inherit these; only colours the game
+	   sets explicitly are painted (see DEFAULT_BG/DEFAULT_FG in the glue). */
+	background: transparent;
+	color: var(--tk-fg);
 	--cursor-color: var(--tk-fg-dim);
 }
 .tk-term__game .bold {

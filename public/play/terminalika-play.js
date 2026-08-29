@@ -83,13 +83,22 @@
 	}
 
 	function clearScreen(fg, bg) {
-		if (term && typeof fg === 'number' && fg >= 0) term.style.color = intToHex(fg);
-		if (term && typeof bg === 'number' && bg >= 0) term.style.backgroundColor = intToHex(bg);
+		if (term && typeof fg === 'number' && fg >= 0 && !DEFAULT_FG.has(fg)) term.style.color = intToHex(fg);
+		if (term && typeof bg === 'number' && bg >= 0 && bg !== DEFAULT_BG) term.style.backgroundColor = intToHex(bg);
 		for (const line of cells) for (const c of line) resetCell(c);
 		shownX = shownY = -1;
 	}
 
 	const UNDERLINES = ['', 'underline', 'double_underline', 'curly_underline', 'dotted_underline', 'dashed_underline'];
+
+	// tcell's web screen has no notion of "default" colour: a cell drawn with
+	// StyleDefault arrives as black-on-#e5e5e5. Treat those (and plain white
+	// text) as "inherit from the page" so the canvas is transparent and the
+	// text follows the site theme — a real terminal's default colours behave
+	// the same way. Games that deliberately paint black backgrounds lose that
+	// (none of ours do).
+	const DEFAULT_BG = 0x000000;
+	const DEFAULT_FG = new Set([0xe5e5e5, 0xffffff]);
 
 	function drawCell(x, y, s, fg, bg, attrs, us, uc) {
 		const c = cells[y] && cells[y][x];
@@ -104,8 +113,8 @@
 
 		if (c.textContent !== s) c.textContent = s;
 
-		const color = fg !== -1 ? intToHex(fg) : '';
-		const back = bg !== -1 ? intToHex(bg) : '';
+		const color = fg !== -1 && !DEFAULT_FG.has(fg) ? intToHex(fg) : '';
+		const back = bg !== -1 && bg !== DEFAULT_BG ? intToHex(bg) : '';
 		if (c.style.color !== color) c.style.color = color;
 		if (c.style.backgroundColor !== back) c.style.backgroundColor = back;
 		const deco = us !== 0 && uc !== -1 ? intToHex(uc) : '';
