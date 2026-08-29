@@ -329,9 +329,18 @@ body::before {
 	color: var(--tk-fg);
 }
 
-/* Tables. */
+/* Tables. Starlight renders <table> as `display: block; overflow: auto` so
+   wide tables scroll without a wrapper div - but that makes the table a
+   block box, which defaults to width:auto (fill the container), while the
+   actual grid inside is still sized by the table layout algorithm to fit
+   its content. A `border` on the table then draws around the full-width
+   block box, leaving a gap to the right of a narrower grid. `fit-content`
+   makes the table's own box hug that grid instead; `max-width: 100%` keeps
+   a genuinely wide table capped at the content column, still scrollable. */
 .sl-markdown-content table:not(:where(.not-content *)) {
 	border: 1px solid var(--tk-border);
+	width: fit-content;
+	max-width: 100%;
 	font-size: 0.9em;
 }
 .sl-markdown-content th:not(:where(.not-content *)) {
@@ -342,6 +351,12 @@ body::before {
 .sl-markdown-content td:not(:where(.not-content *)),
 .sl-markdown-content th:not(:where(.not-content *)) {
 	border: 1px solid var(--tk-border);
+}
+/* Starlight zeroes the inline padding on the first/last column so a
+   borderless table reads flush with the page; restore it now that every
+   cell has a visible border on all sides. */
+.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+	padding-inline: 1rem;
 }
 /* Flag / key names in the first column stay on one line. */
 .sl-markdown-content td:first-child code:not(:where(.not-content *)) {
