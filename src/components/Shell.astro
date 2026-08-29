@@ -47,15 +47,15 @@ const { lines, title = 'terminal', prompt = '$', speed = 28, autoplay = true } =
 		<span class="tk-shell__title">{title}</span>
 		<button class="tk-shell__replay" type="button" aria-label="Replay">↻ replay</button>
 	</div>
-	<pre class="tk-shell__body" aria-live="polite">{lines.map((l) => {
-			const type = l.type ?? 'output';
-			return (
-				<span class={`tk-shell__line tk-shell__line--${type}`} data-type={type} data-delay={l.delay ?? 0} data-text={l.text}>
-					{type === 'input' && <span class="tk-shell__prompt">{prompt}</span>}
-					<span class="tk-shell__text">{l.text}</span>
-				</span>
-			);
-		})}</pre>
+	{/* Whitespace inside the body collapses (white-space: normal); each line
+	    is display:block with white-space: pre, so JSX indentation never leaks
+	    into the rendered text. Keep prompt and text adjacent on one line. */}
+	<div class="tk-shell__body" aria-live="polite">{lines.map((l) => {
+		const type = l.type ?? 'output';
+		return (
+			<span class={`tk-shell__line tk-shell__line--${type}`} data-type={type} data-delay={l.delay ?? 0} data-text={l.text}>{type === 'input' && <span class="tk-shell__prompt">{prompt}</span>}<span class="tk-shell__text">{l.text}</span></span>
+		);
+	})}</div>
 </div>
 
 <script>
@@ -78,7 +78,8 @@ const { lines, title = 'terminal', prompt = '$', speed = 28, autoplay = true } =
 		reset() {
 			this.root.dataset.state = 'idle';
 			for (const line of this.lines) {
-				line.style.display = '';
+				// Hide explicitly: lines are revealed one by one in play().
+				line.style.display = 'none';
 				line.classList.remove('tk-shell__cursor');
 				const text = line.querySelector<HTMLElement>('.tk-shell__text');
 				if (text) text.textContent = line.dataset.type === 'input' ? '' : line.dataset.text ?? '';

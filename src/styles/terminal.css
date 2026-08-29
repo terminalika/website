@@ -138,6 +138,16 @@ body::before {
 	content: '# ';
 	color: var(--tk-fg-faint);
 }
+/* The splash hero title is big enough already; no prefix there. */
+.hero h1::before {
+	content: none;
+}
+
+/* Scrollbars in the page palette (code blocks, tables, shell blocks). */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--tk-border) transparent;
+}
 
 /* Links: underline dotted like a terminal hyperlink. */
 .sl-markdown-content a:not(:where(.not-content *)) {
@@ -171,6 +181,10 @@ body::before {
 .sl-markdown-content td:not(:where(.not-content *)),
 .sl-markdown-content th:not(:where(.not-content *)) {
 	border: 1px solid var(--tk-border);
+}
+/* Flag / key names in the first column stay on one line. */
+.sl-markdown-content td:first-child code:not(:where(.not-content *)) {
+	white-space: nowrap;
 }
 
 /* Asides (:::note / :::caution) — flat, bordered. */
@@ -341,11 +355,14 @@ dialog[aria-label] {
 	margin: 0;
 	padding: 0.9rem 1rem;
 	overflow-x: auto;
-	white-space: pre;
+	white-space: normal; /* JSX whitespace between lines collapses */
 	min-height: 3rem;
+	scrollbar-width: thin;
+	scrollbar-color: var(--tk-border) transparent;
 }
 .tk-shell__line {
 	display: block;
+	white-space: pre; /* but each line keeps its own spacing */
 	min-height: 1.6em;
 }
 .tk-shell__line--input .tk-shell__prompt {
