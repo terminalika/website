@@ -1,0 +1,150 @@
+---
+/**
+ * <Shell> — a tiny simulated terminal session.
+ *
+ * Lines are rendered server-side (so they are readable without JavaScript
+ * and by search), then a small script replays them: input lines are typed
+ * character by character, other lines appear after a short pause.
+ *
+ * Usage in MDX:
+ *
+ *   <Shell title="~/projects" lines={[
+ *     { type: 'input',   text: 'terminalika --game=snake -claude' },
+ *     { type: 'comment', text: '# game starts, pauses when Claude settles' },
+ *     { type: 'output',  text: 'Paused by Claude' },
+ *   ]} />
+ *
+ * Line types: input | output | comment | ok | warn | error
+ */
+export interface ShellLine {
+	type?: 'input' | 'output' | 'comment' | 'ok' | 'warn' | 'error';
+	text: string;
+	/** extra pause before this line, in ms */
+	delay?: number;
+}
+
+interface Props {
+	lines: ShellLine[];
+	title?: string;
+	prompt?: string;
+	/** typing speed per character, ms */
+	speed?: number;
+	/** start automatically when scrolled into view */
+	autoplay?: boolean;
+}
+
+const { lines, title = 'terminal', prompt = '$', speed = 28, autoplay = true } = Astro.props;
+---
+
+<div
+	class="tk-shell not-content"
+	data-prompt={prompt}
+	data-speed={speed}
+	data-autoplay={autoplay ? 'true' : 'false'}
+	data-state="static"
+>
+	<div class="tk-shell__bar">
+		<span class="tk-shell__title">{title}</span>
+		<button class="tk-shell__replay" type="button" aria-label="Replay">↻ replay</button>
+	</div>
+	<pre class="tk-shell__body" aria-live="polite">{lines.map((l) => {
+			const type = l.type ?? 'output';
+			return (
+				<span class={`tk-shell__line tk-shell__line--${type}`} data-type={type} data-delay={l.delay ?? 0} data-text={l.text}>
+					{type === 'input' && <span class="tk-shell__prompt">{prompt}</span>}
+					<span class="tk-shell__text">{l.text}</span>
+				</span>
+			);
+		})}</pre>
+</div>
+
+<script>
+	const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+	const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+	class ShellPlayer {
+		root: HTMLElement;
+		lines: HTMLElement[];
+		speed: number;
+		run = 0;
+
+		constructor(root: HTMLElement) {
+			this.root = root;
+			this.lines = Array.from(root.querySelectorAll<HTMLElement>('.tk-shell__line'));
+			this.speed = Number(root.dataset.speed ?? 28);
+			root.querySelector('.tk-shell__replay')?.addEventListener('click', () => this.play());
+		}
+
+		reset() {
+			this.root.dataset.state = 'idle';
+			for (const line of this.lines) {
+				line.style.display = '';
+				line.classList.remove('tk-shell__cursor');
+				const text = line.querySelector<HTMLElement>('.tk-shell__text');
+				if (text) text.textContent = line.dataset.type === 'input' ? '' : line.dataset.text ?? '';
+			}
+		}
+
+		async play() {
+			const id = ++this.run;
+			this.reset();
+			this.root.dataset.state = 'playing';
+			for (const line of this.lines) {
+				if (id !== this.run) return;
+				const delay = Number(line.dataset.delay ?? 0);
+				if (delay) await sleep(delay);
+				line.style.display = 'block';
+				if (line.dataset.type === 'input') {
+					await this.type(line, id);
+					await sleep(reduced ? 0 : 250);
+				} else {
+					await sleep(reduced ? 0 : 60);
+				}
+			}
+			if (id === this.run) {
+				this.lines.at(-1)?.classList.add('tk-shell__cursor');
+				this.root.dataset.state = 'done';
+			}
+		}
+
+		async type(line: HTMLElement, id: number) {
+			const target = line.querySelector<HTMLElement>('.tk-shell__text');
+			const full = line.dataset.text ?? '';
+			if (!target) return;
+			line.classList.add('tk-shell__cursor');
+			if (reduced) {
+				target.textContent = full;
+			} else {
+				target.textContent = '';
+				for (const ch of full) {
+					if (id !== this.run) return;
+					target.textContent += ch;
+					await sleep(this.speed + Math.random() * this.speed * 0.6);
+				}
+			}
+			line.classList.remove('tk-shell__cursor');
+		}
+	}
+
+	const players = new WeakMap<Element, ShellPlayer>();
+	const observer = new IntersectionObserver(
+		(entries) => {
+			for (const entry of entries) {
+				if (!entry.isIntersecting) continue;
+				const el = entry.target as HTMLElement;
+				observer.unobserve(el);
+				players.get(el)?.play();
+			}
+		},
+		{ threshold: 0.4 }
+	);
+
+	for (const el of document.querySelectorAll<HTMLElement>('.tk-shell')) {
+		const player = new ShellPlayer(el);
+		players.set(el, player);
+		if (el.dataset.autoplay === 'true') {
+			player.reset();
+			observer.observe(el);
+		}
+	}
+</script>

@@ -1,0 +1,407 @@
+/* ==========================================================================
+   terminalika.dev — terminal theme for Starlight
+   --------------------------------------------------------------------------
+   Everything visual derives from the `--tk-*` tokens in the first block.
+   To make a new palette, override those tokens (see the amber example at the
+   bottom) — nothing else needs to change.
+   ========================================================================== */
+
+@import '@fontsource-variable/jetbrains-mono';
+
+/* ---- 1. Palette tokens ------------------------------------------------- */
+:root {
+	--tk-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'Cascadia Code',
+		'Fira Code', Menlo, Consolas, monospace;
+
+	/* phosphor green on near-black */
+	--tk-bg: #0b0e0c;
+	--tk-bg-panel: #10150f;
+	--tk-bg-panel-2: #151c14;
+	--tk-border: #23301f;
+	--tk-fg: #cfe3c8;
+	--tk-fg-dim: #7f9a78;
+	--tk-fg-faint: #4b5f46;
+	--tk-accent: #5af78e;
+	--tk-accent-dim: #2f8a4d;
+	--tk-accent-glow: rgba(90, 247, 142, 0.18);
+	--tk-warn: #f3c969;
+	--tk-error: #ff6b6b;
+	--tk-info: #7fd1ff;
+
+	--tk-prompt: '$';
+	--tk-cursor: '▌';
+}
+
+/* ---- 2. Map tokens onto Starlight's variables -------------------------- */
+:root,
+:root[data-theme='light'],
+:root[data-theme='dark'] {
+	color-scheme: dark;
+
+	--sl-font: var(--tk-font-mono);
+	--sl-font-mono: var(--tk-font-mono);
+
+	--sl-color-white: var(--tk-fg);
+	--sl-color-gray-1: var(--tk-fg);
+	--sl-color-gray-2: var(--tk-fg);
+	--sl-color-gray-3: var(--tk-fg-dim);
+	--sl-color-gray-4: var(--tk-fg-faint);
+	--sl-color-gray-5: var(--tk-border);
+	--sl-color-gray-6: var(--tk-bg-panel);
+	--sl-color-gray-7: var(--tk-bg-panel-2);
+	--sl-color-black: var(--tk-bg);
+
+	--sl-color-accent-low: var(--tk-accent-glow);
+	--sl-color-accent: var(--tk-accent-dim);
+	--sl-color-accent-high: var(--tk-accent);
+
+	--sl-color-bg: var(--tk-bg);
+	--sl-color-bg-nav: var(--tk-bg);
+	--sl-color-bg-sidebar: var(--tk-bg);
+	--sl-color-bg-inline-code: var(--tk-bg-panel-2);
+	--sl-color-hairline: var(--tk-border);
+	--sl-color-hairline-light: var(--tk-border);
+	--sl-color-hairline-shade: var(--tk-border);
+	--sl-color-text: var(--tk-fg);
+	--sl-color-text-accent: var(--tk-accent);
+	--sl-color-text-invert: var(--tk-bg);
+
+	--sl-color-orange: var(--tk-warn);
+	--sl-color-orange-low: rgba(243, 201, 105, 0.12);
+	--sl-color-orange-high: var(--tk-warn);
+	--sl-color-red: var(--tk-error);
+	--sl-color-red-low: rgba(255, 107, 107, 0.12);
+	--sl-color-red-high: var(--tk-error);
+	--sl-color-blue: var(--tk-info);
+	--sl-color-blue-low: rgba(127, 209, 255, 0.12);
+	--sl-color-blue-high: var(--tk-info);
+	--sl-color-green: var(--tk-accent);
+	--sl-color-green-low: var(--tk-accent-glow);
+	--sl-color-green-high: var(--tk-accent);
+	--sl-color-purple: var(--tk-info);
+	--sl-color-purple-low: rgba(127, 209, 255, 0.12);
+	--sl-color-purple-high: var(--tk-info);
+
+	--sl-text-base: 0.95rem;
+	--sl-line-height: 1.7;
+	--sl-content-width: 44rem;
+}
+
+/* ---- 3. Global feel ---------------------------------------------------- */
+html,
+body {
+	background: var(--tk-bg);
+	font-family: var(--tk-font-mono);
+}
+
+::selection {
+	background: var(--tk-accent);
+	color: var(--tk-bg);
+}
+
+/* Subtle scanline wash over the whole page. */
+body::before {
+	content: '';
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	z-index: 0;
+	background: repeating-linear-gradient(
+		0deg,
+		rgba(255, 255, 255, 0.015) 0px,
+		rgba(255, 255, 255, 0.015) 1px,
+		transparent 1px,
+		transparent 3px
+	);
+}
+
+/* Headings look like shell comments / section markers. */
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.sl-markdown-content h3,
+.sl-markdown-content h4,
+.content-panel h1 {
+	font-family: var(--tk-font-mono);
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	color: var(--tk-accent);
+}
+.sl-markdown-content h2::before {
+	content: '## ';
+	color: var(--tk-fg-faint);
+}
+.sl-markdown-content h3::before {
+	content: '### ';
+	color: var(--tk-fg-faint);
+}
+.content-panel h1::before {
+	content: '# ';
+	color: var(--tk-fg-faint);
+}
+
+/* Links: underline dotted like a terminal hyperlink. */
+.sl-markdown-content a:not(:where(.not-content *)) {
+	color: var(--tk-accent);
+	text-decoration: underline dotted;
+	text-underline-offset: 3px;
+}
+.sl-markdown-content a:not(:where(.not-content *)):hover {
+	color: var(--tk-fg);
+	text-decoration-style: solid;
+}
+
+/* Inline code. */
+.sl-markdown-content code:not(:where(.not-content *)) {
+	border: 1px solid var(--tk-border);
+	border-radius: 0;
+	padding: 0.05em 0.35em;
+	color: var(--tk-fg);
+}
+
+/* Tables. */
+.sl-markdown-content table:not(:where(.not-content *)) {
+	border: 1px solid var(--tk-border);
+	font-size: 0.9em;
+}
+.sl-markdown-content th:not(:where(.not-content *)) {
+	background: var(--tk-bg-panel-2);
+	color: var(--tk-accent);
+	font-weight: 600;
+}
+.sl-markdown-content td:not(:where(.not-content *)),
+.sl-markdown-content th:not(:where(.not-content *)) {
+	border: 1px solid var(--tk-border);
+}
+
+/* Asides (:::note / :::caution) — flat, bordered. */
+.starlight-aside {
+	border-radius: 0;
+	border-left-width: 2px;
+	background: var(--tk-bg-panel);
+}
+
+/* Code frames from Expressive Code: square, no shadow. */
+.expressive-code .frame {
+	border-radius: 0 !important;
+	box-shadow: none !important;
+}
+.expressive-code .frame pre {
+	border-radius: 0 !important;
+}
+
+/* ---- 4. Chrome: header + sidebar --------------------------------------- */
+header.header {
+	border-bottom: 1px solid var(--tk-border);
+	background: var(--tk-bg);
+}
+.site-title {
+	font-family: var(--tk-font-mono);
+	font-weight: 600;
+	color: var(--tk-accent);
+}
+.site-title::before {
+	content: var(--tk-prompt) ' ';
+	color: var(--tk-fg-faint);
+}
+.site-title::after {
+	content: var(--tk-cursor);
+	color: var(--tk-accent);
+	animation: tk-blink 1.1s steps(1) infinite;
+	margin-left: 0.1em;
+}
+
+.sidebar-pane {
+	border-right: 1px solid var(--tk-border);
+	background: var(--tk-bg);
+}
+.sidebar-content {
+	font-family: var(--tk-font-mono);
+}
+.sidebar-content summary .large,
+.sidebar-content a {
+	border-radius: 0;
+	font-size: 0.9rem;
+}
+.sidebar-content summary .large {
+	color: var(--tk-fg-dim);
+}
+.sidebar-content a {
+	color: var(--tk-fg-dim);
+}
+.sidebar-content a::before {
+	content: '  ';
+	white-space: pre;
+}
+.sidebar-content a:hover {
+	color: var(--tk-fg);
+	background: transparent;
+}
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover {
+	background: transparent;
+	color: var(--tk-accent);
+	font-weight: 600;
+}
+.sidebar-content a[aria-current='page']::before {
+	content: '> ';
+	white-space: pre;
+	color: var(--tk-accent);
+}
+
+/* Right-hand table of contents. */
+.right-sidebar {
+	border-left: 1px solid var(--tk-border);
+}
+.right-sidebar a[aria-current='true'] {
+	color: var(--tk-accent);
+}
+
+/* Pagination cards. */
+.pagination-links a {
+	border-radius: 0;
+	border: 1px solid var(--tk-border);
+	box-shadow: none;
+}
+.pagination-links a:hover {
+	border-color: var(--tk-accent-dim);
+}
+
+/* Search. */
+site-search button[data-open-modal] {
+	border-radius: 0;
+	border: 1px solid var(--tk-border);
+	background: var(--tk-bg-panel);
+}
+dialog[aria-label] {
+	border-radius: 0;
+}
+
+/* Hero action buttons. */
+.sl-link-button {
+	border-radius: 0;
+	font-family: var(--tk-font-mono);
+	font-weight: 600;
+}
+.sl-link-button.primary {
+	background: var(--tk-accent);
+	color: var(--tk-bg);
+	border-color: var(--tk-accent);
+}
+.sl-link-button.primary:hover {
+	box-shadow: 0 0 0 4px var(--tk-accent-glow);
+}
+.sl-link-button.minimal {
+	color: var(--tk-accent);
+}
+
+/* ---- 5. Shell component ------------------------------------------------ */
+.tk-shell {
+	--sh-bg: var(--tk-bg-panel);
+	--sh-fg: var(--tk-fg);
+	position: relative;
+	margin: 1.5rem 0;
+	border: 1px solid var(--tk-border);
+	background: var(--sh-bg);
+	color: var(--sh-fg);
+	font-family: var(--tk-font-mono);
+	font-size: 0.875rem;
+	line-height: 1.6;
+	overflow: hidden;
+}
+.tk-shell__bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	padding: 0.35rem 0.75rem;
+	border-bottom: 1px solid var(--tk-border);
+	background: var(--tk-bg-panel-2);
+	color: var(--tk-fg-dim);
+	font-size: 0.75rem;
+	user-select: none;
+}
+.tk-shell__title::before {
+	content: '● ';
+	color: var(--tk-accent);
+}
+.tk-shell__replay {
+	appearance: none;
+	background: none;
+	border: 1px solid var(--tk-border);
+	color: var(--tk-fg-dim);
+	font: inherit;
+	cursor: pointer;
+	padding: 0 0.4rem;
+}
+.tk-shell__replay:hover {
+	color: var(--tk-accent);
+	border-color: var(--tk-accent-dim);
+}
+.tk-shell__body {
+	margin: 0;
+	padding: 0.9rem 1rem;
+	overflow-x: auto;
+	white-space: pre;
+	min-height: 3rem;
+}
+.tk-shell__line {
+	display: block;
+	min-height: 1.6em;
+}
+.tk-shell__line--input .tk-shell__prompt {
+	color: var(--tk-accent);
+	margin-right: 0.6ch;
+}
+.tk-shell__line--comment {
+	color: var(--tk-fg-faint);
+}
+.tk-shell__line--output {
+	color: var(--tk-fg-dim);
+}
+.tk-shell__line--ok {
+	color: var(--tk-accent);
+}
+.tk-shell__line--warn {
+	color: var(--tk-warn);
+}
+.tk-shell__line--error {
+	color: var(--tk-error);
+}
+.tk-shell__cursor::after {
+	content: var(--tk-cursor);
+	color: var(--tk-accent);
+	animation: tk-blink 1s steps(1) infinite;
+}
+.tk-shell[data-state='idle'] .tk-shell__line {
+	display: none;
+}
+
+@keyframes tk-blink {
+	50% {
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.site-title::after,
+	.tk-shell__cursor::after {
+		animation: none;
+	}
+}
+
+/* ---- 6. Alternative palette example ------------------------------------
+   Add `data-palette="amber"` to <html> (or toggle it from a script) to get
+   an amber phosphor look. Add more palettes the same way.
+   ------------------------------------------------------------------------ */
+:root[data-palette='amber'] {
+	--tk-bg: #0e0b07;
+	--tk-bg-panel: #16110a;
+	--tk-bg-panel-2: #1d160d;
+	--tk-border: #33271a;
+	--tk-fg: #f1dcb8;
+	--tk-fg-dim: #a68d63;
+	--tk-fg-faint: #5f5038;
+	--tk-accent: #ffb000;
+	--tk-accent-dim: #a06f00;
+	--tk-accent-glow: rgba(255, 176, 0, 0.18);
+}

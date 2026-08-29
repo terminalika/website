@@ -1,0 +1,53 @@
+---
+title: zellij
+description: Why held keys feel sticky inside zellij, and what to do about it.
+---
+
+import Shell from '../../../components/Shell.astro';
+
+<Shell
+	title="terminalika · inside zellij"
+	autoplay={false}
+	lines={[
+		{ type: 'warn', text: 'Zellij does not relay key releases' },
+		{ type: 'output', text: '' },
+		{ type: 'output', text: 'Held keys (paddles, cannon) will feel sticky.' },
+		{ type: 'output', text: 'Your terminal is fine; run outside zellij for smooth movement.' },
+		{ type: 'output', text: '' },
+		{ type: 'comment', text: 'terminalika.dev/terminals/zellij' },
+	]}
+/>
+
+## what is going on
+
+Zellij **answers** the kitty keyboard protocol query itself, claiming
+support, but it does **not forward the outer terminal's real key-release
+events** through to the pane. Your terminal may be perfectly capable (kitty,
+Ghostty, WezTerm, …); the events just never make it past the multiplexer.
+
+If the launcher trusted zellij's answer it would sit waiting for releases
+that never come and fall back to its long hold watchdog, so a paddle would
+keep moving roughly 1.5 s past the actual key-up. That is worse than plain
+auto-repeat, so terminalika special-cases zellij: when the `ZELLIJ`
+environment variable is present the probe is skipped entirely and the
+[auto-repeat fallback](/terminals/#the-fallback-synthesised-releases) is used
+from the start. Zellij forwards auto-repeat just fine, so the game is
+playable, only sticky.
+
+## what to do
+
+- **Run terminalika outside zellij.** Open a plain terminal tab or window
+  instead of a zellij pane; that's all it takes.
+- Or keep zellij and accept the sticky feel; Snake and Tetris are barely
+  affected, Pong and Invaders are.
+
+There is no zellij setting that changes this today; the events are dropped
+inside zellij's own input handling. If a future zellij release starts
+relaying release events, the special case in the launcher will be lifted.
+
+## check for yourself
+
+```sh
+echo $ZELLIJ            # non-empty inside zellij → fallback is used
+terminalika --game=pong # warning screen names zellij
+```

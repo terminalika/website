@@ -1,0 +1,83 @@
+---
+title: key-releases
+description: Why held keys feel sticky in some terminals, which terminals report key releases, and what the launcher does about it.
+---
+
+import Shell from '../../../components/Shell.astro';
+
+## the problem
+
+A terminal normally only tells an application which keys were **pressed**.
+Holding a key down does not produce a "key is down" state; it produces the
+terminal's own **auto-repeat**: one event, a pause, then a burst of events,
+and nothing at all when you let go.
+
+For a text editor that is fine. For a paddle or a cannon that should move
+*while* the key is held and stop *when* it is released, it is not: the game
+cannot tell "still held" from "released", so movement either stutters or
+overshoots. That is what "sticky" means in the warning screen.
+
+## the fix: real release events
+
+Two terminal extensions report key-ups:
+
+- the [kitty keyboard protocol](https://sw.kovidgoyal.net/kitty/keyboard-protocol/)
+  with its *report event types* flag: the terminal sends CSI-u sequences for
+  press, repeat **and release**;
+- **win32-input-mode** (Windows Terminal): every key event, key-ups included.
+
+At start, before the screen is taken over, the launcher asks the terminal
+whether it speaks the kitty protocol (`CSI ? u`, followed by a primary device
+attributes query so there is always an answer to wait for). If it does, the
+terminal I/O is wrapped: release sequences are pulled out of the input stream
+before the UI library (which does not understand them) sees them, repeats are
+rewritten into plain presses, and each release is re-injected in order as a
+marked press so it travels through the normal event queue. Games that
+implement `KeyStateHandler` (Pong, Invaders) then get true press/release
+pairs.
+
+<Shell
+	title="probe"
+	lines={[
+		{ type: 'comment', text: '# what the launcher sends before tcell starts' },
+		{ type: 'input', text: "printf '\\e[?u\\e[c'; sleep 0.2; cat -v" },
+		{ type: 'ok', text: '^[[?1u^[[?62;22c            # kitty protocol, flags 1  → real releases' },
+		{ type: 'warn', text: '^[[?62;22c                  # DA1 only               → auto-repeat fallback' },
+	]}
+/>
+
+## the fallback: synthesised releases
+
+Without support the launcher shows a warning once and then **synthesises** a
+release ~120 ms after a key's last press or auto-repeat. It is playable, but
+there is an inherent lag between letting go and the game noticing, and the
+initial auto-repeat delay of your OS shows up as a hitch when you start
+moving.
+
+## which terminals
+
+| Terminal                                      | Key releases | Notes                                              |
+| --------------------------------------------- | ------------ | -------------------------------------------------- |
+| kitty                                         | yes          |                                                    |
+| foot                                          | yes          |                                                    |
+| Ghostty                                       | yes          |                                                    |
+| Alacritty                                     | yes          |                                                    |
+| WezTerm                                       | yes          | set `enable_kitty_keyboard = true`                 |
+| iTerm2                                        | yes          |                                                    |
+| Konsole                                       | yes          |                                                    |
+| Rio                                           | yes          |                                                    |
+| Windows Terminal                              | yes          | win32-input-mode; detected via `WT_SESSION`        |
+| GNOME Terminal, Tilix, other VTE terminals    | no           | auto-repeat fallback                               |
+| xterm                                         | no           | auto-repeat fallback                               |
+| Terminal.app (macOS)                          | no           | auto-repeat fallback                               |
+| **zellij**                                    | **no**       | claims support but does not relay releases: [zellij](/terminals/zellij/) |
+| **tmux**                                      | **no**       | does not implement the protocol at all: [tmux](/terminals/tmux/) |
+
+If your terminal is in the "yes" rows but you still get the warning, you are
+probably inside a multiplexer; see the two pages above.
+
+## the warning screen
+
+When releases are unavailable a short notice is shown before the menu. It
+names the reason (your terminal, zellij, or tmux) and links to the matching
+page here. Press any key to continue; the game runs with the fallback.

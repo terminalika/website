@@ -1,0 +1,105 @@
+---
+title: install
+description: Download and install terminalika on Linux, macOS and Windows.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import Shell from '../../components/Shell.astro';
+
+Every release ships prebuilt packages and raw binaries on the
+[GitHub releases page](https://github.com/terminalika/terminalika/releases).
+Pick whichever fits your system; there is nothing else to configure.
+
+Supported platforms: **Linux**, **macOS** and **Windows**, each in `amd64` and `arm64`.
+On Windows you need Windows 10+ and a VT-capable terminal (Windows Terminal).
+
+## package managers
+
+<Tabs syncKey="os">
+	<TabItem label="macOS / Linux (Homebrew)">
+		```sh
+		brew tap terminalika/tap
+		brew install --cask terminalika
+		```
+	</TabItem>
+	<TabItem label="Windows (Scoop)">
+		```powershell
+		scoop bucket add terminalika https://github.com/terminalika/scoop-bucket
+		scoop install terminalika
+		```
+	</TabItem>
+	<TabItem label="Go">
+		```sh
+		# needs Go 1.24+
+		go install github.com/terminalika/terminalika@latest
+		```
+	</TabItem>
+</Tabs>
+
+## linux packages
+
+Direct downloads; no third-party repository or AUR needed. Replace the version
+with the latest one from the releases page.
+
+<Tabs syncKey="distro">
+	<TabItem label="Debian / Ubuntu">
+		```sh
+		wget https://github.com/terminalika/terminalika/releases/download/v0.3.2/terminalika_0.3.2_amd64.deb
+		sudo apt install ./terminalika_0.3.2_amd64.deb
+		```
+	</TabItem>
+	<TabItem label="Fedora / RHEL / openSUSE">
+		```sh
+		wget https://github.com/terminalika/terminalika/releases/download/v0.3.2/terminalika-0.3.2-1.x86_64.rpm
+		sudo dnf install ./terminalika-0.3.2-1.x86_64.rpm
+		```
+	</TabItem>
+	<TabItem label="Arch">
+		```sh
+		wget https://github.com/terminalika/terminalika/releases/download/v0.3.2/terminalika-0.3.2-1-x86_64.pkg.tar.zst
+		sudo pacman -U terminalika-0.3.2-1-x86_64.pkg.tar.zst
+		```
+	</TabItem>
+	<TabItem label="Alpine">
+		```sh
+		wget https://github.com/terminalika/terminalika/releases/download/v0.3.2/terminalika_0.3.2_x86_64.apk
+		sudo apk add --allow-untrusted ./terminalika_0.3.2_x86_64.apk
+		```
+	</TabItem>
+</Tabs>
+
+`arm64` / `aarch64` variants of every package are attached to each release too.
+
+## raw binaries
+
+If you would rather not use a package: each release also attaches a `tar.gz`
+(Linux, macOS) or `zip` (Windows) containing a single static `terminalika`
+binary. Drop it somewhere on your `PATH`.
+
+```sh
+tar xzf terminalika_0.3.2_linux_amd64.tar.gz
+install -m 755 terminalika ~/.local/bin/
+```
+
+## verify
+
+<Shell
+	title="verify"
+	lines={[
+		{ type: 'input', text: 'terminalika --version' },
+		{ type: 'ok', text: 'v0.3.2' },
+		{ type: 'input', text: 'terminalika --game=snake', delay: 400 },
+		{ type: 'comment', text: '# terminal goes full-screen; ESC returns to the menu, ESC again quits' },
+	]}
+/>
+
+:::tip[Held keys feel sticky?]
+That is your terminal (or multiplexer), not the game. Terminalika needs a
+terminal that reports key releases; see [terminals/key-releases](/terminals/).
+:::
+
+## next
+
+- [usage/flags](/usage/flags/): everything the binary accepts on the command line.
+- [usage/config.json](/usage/config/): make the agent subscriptions permanent.
+- [agents](/agents/): pause the game when Claude Code or pi is waiting for you.

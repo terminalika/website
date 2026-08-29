@@ -1,0 +1,68 @@
+---
+title: terminalika
+description: A tiny terminal game launcher for developers who want something nostalgic to do while their AI agents are working.
+template: splash
+hero:
+  tagline: Something nostalgic to do while your AI agent is working. Snake, Tetris, Invaders and Pong, in your terminal, paused the moment the agent needs you.
+  actions:
+    - text: install
+      link: /install/
+      icon: right-arrow
+    - text: source
+      link: https://github.com/terminalika/terminalika
+      icon: external
+      variant: minimal
+---
+
+import Shell from '../../components/Shell.astro';
+
+<Shell
+	title="~/my-project"
+	lines={[
+		{ type: 'comment', text: '# start Snake, pause automatically when Claude Code finishes a turn' },
+		{ type: 'input', text: 'terminalika --game=snake -claude' },
+		{ type: 'output', text: '', delay: 300 },
+		{ type: 'output', text: '   ┌────────────────────────────┐' },
+		{ type: 'output', text: '   │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓            │' },
+		{ type: 'output', text: '   │      ●             ▓▓▓     │' },
+		{ type: 'output', text: '   │                            │' },
+		{ type: 'output', text: '   │        Paused by Claude    │' },
+		{ type: 'output', text: '   └────────────────────────────┘' },
+		{ type: 'output', text: '' },
+		{ type: 'ok', text: 'score 140  ·  best 310  ·  SPACE resume  ·  ESC menu', delay: 400 },
+	]}
+/>
+
+## what it is
+
+`terminalika` is a single static binary that opens a minimalist menu of built-in games and runs the one you pick, full-screen, in the terminal you already have open. It is written in Go on top of [tcell](https://github.com/gdamore/tcell) and ships as `.deb`, `.rpm`, Arch package, Homebrew cask, Scoop manifest and raw binaries for Linux, macOS and Windows.
+
+The twist: it can **watch your coding agent**. Point it at [Claude Code](/agents/claude/) or [pi](/agents/pi/) and the game pauses itself the moment the agent stops and waits for your input, so you never miss a turn while you are busy losing at Tetris.
+
+## quick start
+
+```sh
+# Homebrew (macOS / Linux)
+brew tap terminalika/tap && brew install --cask terminalika
+
+# open the menu
+terminalika
+
+# or jump straight into a game
+terminalika --game=tetris
+```
+
+Other platforms and package formats: [install](/install/).
+
+## where to go next
+
+| I want to…                                              | Read                                   |
+| ------------------------------------------------------- | -------------------------------------- |
+| install it                                              | [install](/install/)                   |
+| see every command line flag                             | [usage/flags](/usage/flags/)           |
+| make settings stick without flags                       | [usage/config.json](/usage/config/)    |
+| pause the game when my agent needs me                   | [agents](/agents/)                     |
+| understand why held keys feel sticky                    | [terminals/key-releases](/terminals/)  |
+| fix it under zellij or tmux                             | [zellij](/terminals/zellij/) · [tmux](/terminals/tmux/) |
+| drive the game from another program                     | [websocket](/websocket/)               |
+| hack on it                                              | [development](/development/)           |

@@ -1,0 +1,51 @@
+---
+title: tmux
+description: Why held keys feel sticky inside tmux, and what to do about it.
+---
+
+import Shell from '../../../components/Shell.astro';
+
+<Shell
+	title="terminalika · inside tmux"
+	autoplay={false}
+	lines={[
+		{ type: 'warn', text: 'tmux does not support the kitty keyboard protocol' },
+		{ type: 'output', text: '' },
+		{ type: 'output', text: 'Held keys (paddles, cannon) will feel sticky.' },
+		{ type: 'output', text: 'Your terminal is fine; run outside tmux for smooth movement.' },
+		{ type: 'output', text: '' },
+		{ type: 'comment', text: 'terminalika.dev/terminals/tmux' },
+	]}
+/>
+
+## what is going on
+
+tmux does not implement the kitty keyboard protocol. What it *does* forward,
+with `extended-keys on`, is xterm's `modifyOtherKeys` / fixterms-style
+encoding for **modified** keys, and that encoding has no press / repeat /
+release event type at all. No tmux option (`extended-keys`,
+`terminal-features`, anything) can produce a key-release event through it,
+whatever the outer terminal is. (See tmux issues
+[#3335](https://github.com/tmux/tmux/issues/3335),
+[#4158](https://github.com/tmux/tmux/issues/4158) and
+[#4196](https://github.com/tmux/tmux/issues/4196).)
+
+Because tmux also swallows the probe query, terminalika does not bother
+probing: when the `TMUX` environment variable is present it goes straight to
+the [auto-repeat fallback](/terminals/#the-fallback-synthesised-releases).
+Auto-repeat passes through tmux normally, so the game is playable, only
+sticky.
+
+## what to do
+
+- **Run terminalika outside tmux.** Open a plain terminal tab or window; the
+  launcher is a standalone binary and needs nothing from the tmux session.
+- Or keep tmux and accept the sticky feel; Snake and Tetris are barely
+  affected, Pong and Invaders are.
+
+## check for yourself
+
+```sh
+echo $TMUX              # non-empty inside tmux → fallback is used
+terminalika --game=pong # warning screen names tmux
+```
