@@ -359,6 +359,20 @@ header.header {
 	border-bottom: 1px solid var(--tk-border);
 	background: var(--tk-bg);
 }
+/* Centre the search box: Starlight's grid is `title | 1fr | right`, which
+   parks the search at the title's edge. Symmetric outer columns fix that. */
+@media (min-width: 50rem) {
+	header.header .header {
+		grid-template-columns: 1fr minmax(0, 24rem) 1fr;
+	}
+	header.header .header > :last-child {
+		justify-self: end;
+	}
+	header.header site-search button[data-open-modal] {
+		width: 100%;
+		max-width: none;
+	}
+}
 .site-title {
 	font-family: var(--tk-font-display);
 	font-weight: 600; /* semibold */
