@@ -16,11 +16,12 @@ export default defineConfig({
 			],
 			customCss: ['./src/styles/terminal.css'],
 			components: {
-				// Single dark palette: the theme toggle is replaced with nothing.
-				ThemeSelect: './src/components/Empty.astro',
+				// Terminal-style [dark]/[light] toggle instead of the stock <select>.
+				ThemeSelect: './src/components/ThemeToggle.astro',
 			},
 			expressiveCode: {
-				themes: ['github-dark-default'],
+				// Order matters for Starlight: [dark, light]; picked via data-theme.
+				themes: ['github-dark-default', 'github-light-default'],
 				styleOverrides: {
 					borderRadius: '0',
 					borderColor: 'var(--tk-border)',

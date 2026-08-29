@@ -1,19 +1,34 @@
 /* ==========================================================================
    terminalika.dev — terminal theme for Starlight
    --------------------------------------------------------------------------
-   Everything visual derives from the `--tk-*` tokens in the first block.
-   To make a new palette, override those tokens (see the amber example at the
-   bottom) — nothing else needs to change.
+   RULE (enforced by `npm run check:theme`, see CLAUDE.md):
+     every colour on this site is a `--tk-*` token, and every token is
+     defined twice — once in the DARK block and once in the LIGHT block.
+     Never write a raw colour value outside sections 1 and 7.
+
+   Mode switching: Starlight sets `data-theme="dark|light"` on <html>
+   (from localStorage or the system preference); the toggle in
+   src/components/ThemeToggle.astro flips it. The @media fallback covers
+   the no-JS case.
    ========================================================================== */
 
 @import '@fontsource-variable/jetbrains-mono';
 
 /* ---- 1. Palette tokens ------------------------------------------------- */
+
+/* Shared, colour-less tokens. */
 :root {
 	--tk-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'Cascadia Code',
 		'Fira Code', Menlo, Consolas, monospace;
+	--tk-prompt: '$';
+	--tk-cursor: '▌';
+}
 
-	/* phosphor green on near-black */
+/* DARK — phosphor green on near-black (default). */
+:root,
+:root[data-theme='dark'] {
+	color-scheme: dark;
+
 	--tk-bg: #0b0e0c;
 	--tk-bg-panel: #10150f;
 	--tk-bg-panel-2: #151c14;
@@ -25,19 +40,70 @@
 	--tk-accent-dim: #2f8a4d;
 	--tk-accent-glow: rgba(90, 247, 142, 0.18);
 	--tk-warn: #f3c969;
+	--tk-warn-low: rgba(243, 201, 105, 0.12);
 	--tk-error: #ff6b6b;
+	--tk-error-low: rgba(255, 107, 107, 0.12);
 	--tk-info: #7fd1ff;
+	--tk-info-low: rgba(127, 209, 255, 0.12);
+	--tk-scanline: rgba(255, 255, 255, 0.015);
+	--tk-selection-bg: #5af78e;
+	--tk-selection-fg: #0b0e0c;
+}
 
-	--tk-prompt: '$';
-	--tk-cursor: '▌';
+/* LIGHT — ink green on paper. */
+:root[data-theme='light'] {
+	color-scheme: light;
+
+	--tk-bg: #f6f8f4;
+	--tk-bg-panel: #eef2ea;
+	--tk-bg-panel-2: #e4eadf;
+	--tk-border: #cbd7c4;
+	--tk-fg: #1b271a;
+	--tk-fg-dim: #4c6146;
+	--tk-fg-faint: #8a9c84;
+	--tk-accent: #1e7a3c;
+	--tk-accent-dim: #4f9c66;
+	--tk-accent-glow: rgba(30, 122, 60, 0.16);
+	--tk-warn: #8a5f00;
+	--tk-warn-low: rgba(138, 95, 0, 0.12);
+	--tk-error: #b3261e;
+	--tk-error-low: rgba(179, 38, 30, 0.12);
+	--tk-info: #0b6aa3;
+	--tk-info-low: rgba(11, 106, 163, 0.12);
+	--tk-scanline: rgba(0, 0, 0, 0.02);
+	--tk-selection-bg: #1e7a3c;
+	--tk-selection-fg: #f6f8f4;
+}
+
+/* No-JS fallback: follow the OS when Starlight's script hasn't stamped a theme. */
+@media (prefers-color-scheme: light) {
+	:root:not([data-theme]) {
+		color-scheme: light;
+
+		--tk-bg: #f6f8f4;
+		--tk-bg-panel: #eef2ea;
+		--tk-bg-panel-2: #e4eadf;
+		--tk-border: #cbd7c4;
+		--tk-fg: #1b271a;
+		--tk-fg-dim: #4c6146;
+		--tk-fg-faint: #8a9c84;
+		--tk-accent: #1e7a3c;
+		--tk-accent-dim: #4f9c66;
+		--tk-accent-glow: rgba(30, 122, 60, 0.16);
+		--tk-warn: #8a5f00;
+		--tk-warn-low: rgba(138, 95, 0, 0.12);
+		--tk-error: #b3261e;
+		--tk-error-low: rgba(179, 38, 30, 0.12);
+		--tk-info: #0b6aa3;
+		--tk-info-low: rgba(11, 106, 163, 0.12);
+		--tk-scanline: rgba(0, 0, 0, 0.02);
+		--tk-selection-bg: #1e7a3c;
+		--tk-selection-fg: #f6f8f4;
+	}
 }
 
 /* ---- 2. Map tokens onto Starlight's variables -------------------------- */
-:root,
-:root[data-theme='light'],
-:root[data-theme='dark'] {
-	color-scheme: dark;
-
+:root {
 	--sl-font: var(--tk-font-mono);
 	--sl-font-mono: var(--tk-font-mono);
 
@@ -67,19 +133,19 @@
 	--sl-color-text-invert: var(--tk-bg);
 
 	--sl-color-orange: var(--tk-warn);
-	--sl-color-orange-low: rgba(243, 201, 105, 0.12);
+	--sl-color-orange-low: var(--tk-warn-low);
 	--sl-color-orange-high: var(--tk-warn);
 	--sl-color-red: var(--tk-error);
-	--sl-color-red-low: rgba(255, 107, 107, 0.12);
+	--sl-color-red-low: var(--tk-error-low);
 	--sl-color-red-high: var(--tk-error);
 	--sl-color-blue: var(--tk-info);
-	--sl-color-blue-low: rgba(127, 209, 255, 0.12);
+	--sl-color-blue-low: var(--tk-info-low);
 	--sl-color-blue-high: var(--tk-info);
 	--sl-color-green: var(--tk-accent);
 	--sl-color-green-low: var(--tk-accent-glow);
 	--sl-color-green-high: var(--tk-accent);
 	--sl-color-purple: var(--tk-info);
-	--sl-color-purple-low: rgba(127, 209, 255, 0.12);
+	--sl-color-purple-low: var(--tk-info-low);
 	--sl-color-purple-high: var(--tk-info);
 
 	--sl-text-base: 0.95rem;
@@ -87,16 +153,59 @@
 	--sl-content-width: 44rem;
 }
 
+/* Starlight re-declares its palette under [data-theme='light']; override it
+   with the same token mapping so both modes go through --tk-*. */
+:root[data-theme='light'] {
+	--sl-color-white: var(--tk-fg);
+	--sl-color-gray-1: var(--tk-fg);
+	--sl-color-gray-2: var(--tk-fg);
+	--sl-color-gray-3: var(--tk-fg-dim);
+	--sl-color-gray-4: var(--tk-fg-faint);
+	--sl-color-gray-5: var(--tk-border);
+	--sl-color-gray-6: var(--tk-bg-panel);
+	--sl-color-gray-7: var(--tk-bg-panel-2);
+	--sl-color-black: var(--tk-bg);
+	--sl-color-accent-low: var(--tk-accent-glow);
+	--sl-color-accent: var(--tk-accent-dim);
+	--sl-color-accent-high: var(--tk-accent);
+	--sl-color-bg: var(--tk-bg);
+	--sl-color-bg-nav: var(--tk-bg);
+	--sl-color-bg-sidebar: var(--tk-bg);
+	--sl-color-bg-inline-code: var(--tk-bg-panel-2);
+	--sl-color-hairline: var(--tk-border);
+	--sl-color-hairline-light: var(--tk-border);
+	--sl-color-hairline-shade: var(--tk-border);
+	--sl-color-text: var(--tk-fg);
+	--sl-color-text-accent: var(--tk-accent);
+	--sl-color-text-invert: var(--tk-bg);
+	--sl-color-orange: var(--tk-warn);
+	--sl-color-orange-low: var(--tk-warn-low);
+	--sl-color-orange-high: var(--tk-warn);
+	--sl-color-red: var(--tk-error);
+	--sl-color-red-low: var(--tk-error-low);
+	--sl-color-red-high: var(--tk-error);
+	--sl-color-blue: var(--tk-info);
+	--sl-color-blue-low: var(--tk-info-low);
+	--sl-color-blue-high: var(--tk-info);
+	--sl-color-green: var(--tk-accent);
+	--sl-color-green-low: var(--tk-accent-glow);
+	--sl-color-green-high: var(--tk-accent);
+	--sl-color-purple: var(--tk-info);
+	--sl-color-purple-low: var(--tk-info-low);
+	--sl-color-purple-high: var(--tk-info);
+}
+
 /* ---- 3. Global feel ---------------------------------------------------- */
 html,
 body {
 	background: var(--tk-bg);
+	color: var(--tk-fg);
 	font-family: var(--tk-font-mono);
 }
 
 ::selection {
-	background: var(--tk-accent);
-	color: var(--tk-bg);
+	background: var(--tk-selection-bg);
+	color: var(--tk-selection-fg);
 }
 
 /* Subtle scanline wash over the whole page. */
@@ -108,8 +217,8 @@ body::before {
 	z-index: 0;
 	background: repeating-linear-gradient(
 		0deg,
-		rgba(255, 255, 255, 0.015) 0px,
-		rgba(255, 255, 255, 0.015) 1px,
+		var(--tk-scanline) 0px,
+		var(--tk-scanline) 1px,
 		transparent 1px,
 		transparent 3px
 	);
@@ -308,15 +417,42 @@ dialog[aria-label] {
 	color: var(--tk-accent);
 }
 
-/* ---- 5. Shell component ------------------------------------------------ */
+/* ---- 5. Theme toggle (src/components/ThemeToggle.astro) ---------------- */
+.tk-theme-toggle {
+	appearance: none;
+	background: var(--tk-bg-panel);
+	border: 1px solid var(--tk-border);
+	color: var(--tk-fg-dim);
+	font: inherit;
+	font-family: var(--tk-font-mono);
+	font-size: 0.8rem;
+	line-height: 1;
+	padding: 0.45rem 0.6rem;
+	cursor: pointer;
+	white-space: nowrap;
+}
+.tk-theme-toggle:hover,
+.tk-theme-toggle:focus-visible {
+	color: var(--tk-accent);
+	border-color: var(--tk-accent-dim);
+	outline: none;
+}
+.tk-theme-toggle::before {
+	content: '[';
+	color: var(--tk-fg-faint);
+}
+.tk-theme-toggle::after {
+	content: ']';
+	color: var(--tk-fg-faint);
+}
+
+/* ---- 6. Shell component ------------------------------------------------ */
 .tk-shell {
-	--sh-bg: var(--tk-bg-panel);
-	--sh-fg: var(--tk-fg);
 	position: relative;
 	margin: 1.5rem 0;
 	border: 1px solid var(--tk-border);
-	background: var(--sh-bg);
-	color: var(--sh-fg);
+	background: var(--tk-bg-panel);
+	color: var(--tk-fg);
 	font-family: var(--tk-font-mono);
 	font-size: 0.875rem;
 	line-height: 1.6;
@@ -357,8 +493,6 @@ dialog[aria-label] {
 	overflow-x: auto;
 	white-space: normal; /* JSX whitespace between lines collapses */
 	min-height: 3rem;
-	scrollbar-width: thin;
-	scrollbar-color: var(--tk-border) transparent;
 }
 .tk-shell__line {
 	display: block;
@@ -406,11 +540,12 @@ dialog[aria-label] {
 	}
 }
 
-/* ---- 6. Alternative palette example ------------------------------------
-   Add `data-palette="amber"` to <html> (or toggle it from a script) to get
-   an amber phosphor look. Add more palettes the same way.
+/* ---- 7. Alternative palette example ------------------------------------
+   Set `data-palette="amber"` on <html> for an amber phosphor look. A palette
+   must provide BOTH modes, keyed on data-theme exactly like the default one.
    ------------------------------------------------------------------------ */
-:root[data-palette='amber'] {
+:root[data-palette='amber'],
+:root[data-palette='amber'][data-theme='dark'] {
 	--tk-bg: #0e0b07;
 	--tk-bg-panel: #16110a;
 	--tk-bg-panel-2: #1d160d;
@@ -421,4 +556,20 @@ dialog[aria-label] {
 	--tk-accent: #ffb000;
 	--tk-accent-dim: #a06f00;
 	--tk-accent-glow: rgba(255, 176, 0, 0.18);
+	--tk-selection-bg: #ffb000;
+	--tk-selection-fg: #0e0b07;
+}
+:root[data-palette='amber'][data-theme='light'] {
+	--tk-bg: #fbf6ec;
+	--tk-bg-panel: #f3ebdb;
+	--tk-bg-panel-2: #eadfc9;
+	--tk-border: #d6c7a8;
+	--tk-fg: #2a2114;
+	--tk-fg-dim: #6b5734;
+	--tk-fg-faint: #a08f6e;
+	--tk-accent: #8a5a00;
+	--tk-accent-dim: #b5842e;
+	--tk-accent-glow: rgba(138, 90, 0, 0.16);
+	--tk-selection-bg: #8a5a00;
+	--tk-selection-fg: #fbf6ec;
 }

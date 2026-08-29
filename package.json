@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+    "check:theme": "node scripts/check-theme.mjs",
+    "prebuild": "npm run check:theme",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"

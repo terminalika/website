@@ -34,8 +34,12 @@ The sidebar is defined in `astro.config.mjs`.
 ## theming
 
 All colours derive from the `--tk-*` custom properties at the top of
-`src/styles/terminal.css`. To add a palette, add a block like the existing
-`:root[data-palette='amber']` and set `data-palette` on `<html>`.
+`src/styles/terminal.css`, defined once for dark and once for light
+(`data-theme` on `<html>`, flipped by `src/components/ThemeToggle.astro`).
+Rule: every token exists in both modes and no raw colour appears anywhere
+else; `npm run check:theme` (run automatically before `build`) enforces it.
+See `CLAUDE.md`. To add a palette, copy the `data-palette='amber'` blocks
+(dark + light) and set `data-palette` on `<html>`.
 
 ## shell blocks
 

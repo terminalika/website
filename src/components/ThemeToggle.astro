@@ -1,0 +1,50 @@
+---
+/**
+ * <ThemeToggle> — replaces Starlight's ThemeSelect.
+ *
+ * A single button that flips between dark and light, rendered as
+ * `[dark]` / `[light]`. It writes the same localStorage key Starlight's own
+ * theme script reads (`starlight-theme`), so the chosen mode survives
+ * navigation and reloads without a flash, and stamps `data-theme` on <html>
+ * so the `--tk-*` tokens in src/styles/terminal.css switch immediately.
+ */
+---
+
+<button
+	class="tk-theme-toggle"
+	type="button"
+	data-theme-toggle
+	aria-live="polite"
+	title="Toggle dark / light mode">dark</button>
+
+<script>
+	const KEY = 'starlight-theme';
+	type Theme = 'dark' | 'light';
+
+	const root = document.documentElement;
+
+	function current(): Theme {
+		if (root.dataset.theme === 'light' || root.dataset.theme === 'dark') return root.dataset.theme;
+		return matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+	}
+
+	function apply(theme: Theme) {
+		root.dataset.theme = theme;
+		try {
+			localStorage.setItem(KEY, theme);
+		} catch {
+			/* storage may be unavailable; the page still switches for this view */
+		}
+		for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
+			btn.textContent = theme;
+			btn.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`);
+		}
+	}
+
+	// Reflect whatever Starlight's inline script already decided.
+	apply(current());
+
+	for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
+		btn.addEventListener('click', () => apply(current() === 'dark' ? 'light' : 'dark'));
+	}
+</script>
