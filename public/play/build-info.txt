@@ -1,0 +1,4 @@
+built:  2026-08-29T12:41:19Z
+go:     go1.26.5-X:nodwarf5
+core:   sibling checkout /home/hyvin/terminalika/terminalika-core @ a4eca54 (dirty)
+tcell:  v2.13.10

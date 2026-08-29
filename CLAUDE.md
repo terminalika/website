@@ -54,5 +54,22 @@ driven by `data-theme` on `<html>`). To keep both modes complete:
   that only knows `terminalika`. Its `FLAGS` table and error strings mirror
   the Go binary (`main.go` flag definitions, Go `flag` package messages);
   when a flag is added or renamed in the launcher, update it there too.
+- Running `terminalika` there launches the **real games**: `wasm/` is a
+  small Go module (terminalika-core games, tcell's WebAssembly screen, a
+  trimmed port of the launcher's menu/engine). `npm run build:wasm` compiles
+  it into `public/play/terminalika.wasm` (committed; ~4 MB, gzips to ~1 MB),
+  copies `wasm_exec.js` from GOROOT and records what it was built from in
+  `public/play/build-info.txt`. It prefers a sibling `../terminalika-core`
+  checkout (through a throwaway go.work) and falls back to the version
+  pinned in `wasm/go.mod`; the site does not need to track every core
+  release — rebuild when you want newer games. `npm run test:wasm` boots
+  the binary headlessly (menu + every game, ESC exits). The engine uses a
+  structural `keyStateHandler` interface so it builds against older cores.
+  `public/play/terminalika-play.js` is the renderer/glue derived from
+  tcell's `webfiles/tcell.js` (Apache-2.0 header kept); browser keyup is
+  relayed as a release (meta=true) so held keys feel right.
+- Theme-rule exception: the game canvas (`.tk-term__game`) shows whatever
+  colours the Go program paints, like a real terminal; those come from the
+  wasm, not from CSS, so the rule still holds for the stylesheet.
 - The launcher's warning screens link to `/terminals`, `/terminals/zellij`
   and `/terminals/tmux`; keep those routes stable.

@@ -25,7 +25,8 @@ src/
 │   └── development.md
 ├── components/
 │   ├── Shell.astro       # animated fake terminal (<Shell lines={[...]} />)
-│   ├── Terminal.astro    # interactive shell on the home page; only `terminalika` exists
+│   ├── Terminal.astro    # interactive shell on the home page; only `terminalika` exists,
+│   │                     # and it runs the real games (WebAssembly, see wasm/)
 │   └── Empty.astro       # renders nothing; used to drop Starlight's theme toggle
 └── styles/terminal.css   # the whole look; palette tokens at the top
 ```
@@ -62,6 +63,21 @@ import Shell from '../../components/Shell.astro';
 
 Input lines are typed character by character when the block scrolls into
 view; `autoplay={false}` shows it static with a replay button.
+
+## playable games (WebAssembly)
+
+`wasm/` is a tiny Go module: the published `terminalika-core` games, tcell's
+WebAssembly screen and a trimmed port of the launcher's menu + engine.
+
+```sh
+npm run build:wasm   # needs Go 1.24+; writes public/play/terminalika.wasm + wasm_exec.js
+npm run test:wasm    # headless smoke test: boots the wasm, presses ESC, expects a clean exit
+```
+
+The built `.wasm` is committed on purpose: the site doesn't need to track
+every core release. Bump the pin in `wasm/go.mod` and rebuild when you want
+newer games. `public/play/terminalika-play.js` is the DOM renderer/glue
+(derived from tcell's `webfiles/tcell.js`, Apache-2.0).
 
 ## deploy
 

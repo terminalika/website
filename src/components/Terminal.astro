@@ -1,14 +1,18 @@
 ---
 /**
- * <Terminal> — an interactive fake shell that only knows `terminalika`.
+ * <Terminal> — an interactive shell that only knows `terminalika`, and runs
+ * the real thing.
  *
  *  - type: inline ghost text suggests the completion; Tab / → accepts it,
  *    Tab with several candidates lists them (bash style);
  *  - Enter runs the line; ↑/↓ walk history; Ctrl+L clears; Ctrl+C cancels;
- *  - anything that isn't `terminalika` is rejected with "command not found".
+ *  - anything that isn't `terminalika` is rejected with "command not found";
+ *  - `terminalika` / `terminalika --game=<name>` hands the screen to the
+ *    WebAssembly build of the launcher (public/play/, built from wasm/ by
+ *    `npm run build:wasm`); ESC on its menu returns to the shell.
  *
- * The command's behaviour (flags, errors, menu, game screens) mirrors the
- * real binary as closely as a static page can.
+ * Flag parsing and error strings mirror the Go binary (`main.go` + the Go
+ * `flag` package), so what you see here is what the real one says.
  */
 interface Props {
 	title?: string;
@@ -17,7 +21,7 @@ interface Props {
 const { title = '~', version = 'v0.3.2' } = Astro.props;
 ---
 
-<div class="tk-term not-content" data-version={version} tabindex="0" aria-label="Interactive terminal, only the terminalika command is available">
+<div class="tk-term not-content" data-version={version} data-mode="shell" tabindex="0" aria-label="Interactive terminal, only the terminalika command is available">
 	<div class="tk-term__bar">
 		<span class="tk-term__title">{title}</span>
 		<span class="tk-term__hint">try <kbd>terminalika</kbd> · Tab completes · Ctrl+L clears</span>
@@ -31,6 +35,7 @@ const { title = '~', version = 'v0.3.2' } = Astro.props;
 			<span class="tk-term__ghost"></span>
 		</div>
 		<input class="tk-term__input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="command input" />
+		<pre class="tk-term__game" hidden tabindex="0" aria-label="terminalika"></pre>
 	</div>
 </div>
 
@@ -49,17 +54,36 @@ const { title = '~', version = 'v0.3.2' } = Astro.props;
 		ws: { type: 'string', help: 'WebSocket base address for events/commands (empty disables)', def: '127.0.0.1:8080' },
 	};
 
-	const COMPLETIONS = [
-		'--game=invaders',
-		'--game=pong',
-		'--game=snake',
-		'--game=tetris',
-		'--claude',
-		'--pi',
-		'--ws=',
-		'--version',
-		'-h',
-	];
+	const COMPLETIONS = ['--game=invaders', '--game=pong', '--game=snake', '--game=tetris', '--claude', '--pi', '--ws=', '--version', '-h'];
+
+	const PLAY_SCRIPTS = ['/play/wasm_exec.js', '/play/terminalika-play.js'];
+
+	declare global {
+		interface Window {
+			terminalikaPlay?: (el: HTMLElement, args: string[]) => Promise<void>;
+		}
+	}
+
+	let scriptsLoaded: Promise<void> | null = null;
+	function loadPlayScripts(): Promise<void> {
+		if (!scriptsLoaded) {
+			scriptsLoaded = (async () => {
+				for (const src of PLAY_SCRIPTS) {
+					await new Promise<void>((resolve, reject) => {
+						const s = document.createElement('script');
+						s.src = src;
+						s.onload = () => resolve();
+						s.onerror = () => reject(new Error(`could not load ${src}`));
+						document.head.append(s);
+					});
+				}
+			})().catch((err) => {
+				scriptsLoaded = null;
+				throw err;
+			});
+		}
+		return scriptsLoaded;
+	}
 
 	class Term {
 		root: HTMLElement;
@@ -67,10 +91,12 @@ const { title = '~', version = 'v0.3.2' } = Astro.props;
 		typed: HTMLElement;
 		ghost: HTMLElement;
 		input: HTMLInputElement;
+		game: HTMLElement;
 		version: string;
 		history: string[] = [];
 		histIdx = -1;
 		draft = '';
+		playing = false;
 
 		constructor(root: HTMLElement) {
 			this.root = root;
@@ -78,18 +104,26 @@ const { title = '~', version = 'v0.3.2' } = Astro.props;
 			this.typed = root.querySelector('.tk-term__typed')!;
 			this.ghost = root.querySelector('.tk-term__ghost')!;
 			this.input = root.querySelector('.tk-term__input')!;
+			this.game = root.querySelector('.tk-term__game')!;
 			this.version = root.dataset.version ?? 'dev';
 
-			root.addEventListener('click', () => this.input.focus());
-			root.addEventListener('focus', () => this.input.focus());
+			root.addEventListener('click', () => this.focus());
+			root.addEventListener('focus', () => this.focus());
 			this.input.addEventListener('input', () => this.render());
 			this.input.addEventListener('keydown', (e) => this.key(e));
 			this.input.addEventListener('focus', () => root.classList.add('is-focused'));
 			this.input.addEventListener('blur', () => root.classList.remove('is-focused'));
+			this.game.addEventListener('focus', () => root.classList.add('is-focused'));
+			this.game.addEventListener('blur', () => root.classList.remove('is-focused'));
 
 			this.print('muted', `terminalika ${this.version} · a shell that only knows one command`);
-			this.print('muted', 'type terminalika, press Tab to complete, Enter to run.');
+			this.print('muted', 'type terminalika, press Tab to complete, Enter to run. the games are real.');
 			this.render();
+		}
+
+		focus() {
+			if (this.playing) this.game.focus({ preventScroll: true });
+			else this.input.focus({ preventScroll: true });
 		}
 
 		/* ---- rendering ------------------------------------------------- */
@@ -104,7 +138,7 @@ const { title = '~', version = 'v0.3.2' } = Astro.props;
 			line.className = `tk-term__row tk-term__row--${kind}`;
 			line.textContent = text;
 			this.out.append(line);
-			this.out.scrollTop = this.out.scrollHeight;
+			this.scrollToEnd();
 		}
 
 		echo(cmd: string) {
@@ -115,11 +149,16 @@ const { title = '~', version = 'v0.3.2' } = Astro.props;
 			p.textContent = '$';
 			line.append(p, document.createTextNode(' ' + cmd));
 			this.out.append(line);
+			this.scrollToEnd();
+		}
+
+		scrollToEnd() {
+			const screen = this.out.parentElement!;
+			screen.scrollTop = screen.scrollHeight;
 		}
 
 		/* ---- completion ------------------------------------------------ */
 
-		/** Candidates for the last word of the current line. */
 		candidates(line: string): string[] {
 			const words = line.split(/\s+/);
 			const last = words[words.length - 1] ?? '';
@@ -130,7 +169,6 @@ const { title = '~', version = 'v0.3.2' } = Astro.props;
 			}
 			if (first !== 'terminalika') return [];
 
-			// --game=sn → --game=snake ; --g → --game= ; -- → all flags
 			const norm = last.startsWith('--') ? last : last.startsWith('-') && last.length > 1 && last !== '-h' ? '-' + last : last;
 			const used = new Set(words.slice(1, -1).map((w) => w.replace(/^-+/, '').split('=')[0]));
 			return COMPLETIONS.filter((c) => {
@@ -168,7 +206,6 @@ const { title = '~', version = 'v0.3.2' } = Astro.props;
 					}
 				}
 			}
-			// A completed bool flag or command wants a space after it.
 			if (/^terminalika$|--claude$|--pi$|--version$|-h$|--game=\w+$/.test(this.input.value)) this.input.value += ' ';
 			this.render();
 		}
@@ -178,10 +215,11 @@ const { title = '~', version = 'v0.3.2' } = Astro.props;
 		key(e: KeyboardEvent) {
 			if (e.key === 'Enter') {
 				e.preventDefault();
-				this.run(this.input.value);
+				const line = this.input.value;
 				this.input.value = '';
 				this.histIdx = -1;
 				this.render();
+				void this.run(line);
 			} else if (e.key === 'Tab' || (e.key === 'ArrowRight' && this.input.selectionStart === this.input.value.length && this.ghost.textContent)) {
 				e.preventDefault();
 				this.accept();
@@ -212,7 +250,7 @@ const { title = '~', version = 'v0.3.2' } = Astro.props;
 
 		/* ---- the one command ------------------------------------------- */
 
-		run(raw: string) {
+		async run(raw: string) {
 			const line = raw.trim();
 			this.echo(raw);
 			if (!line) return;
@@ -225,18 +263,15 @@ const { title = '~', version = 'v0.3.2' } = Astro.props;
 				this.print('muted', 'only one command lives here: terminalika  (try: terminalika -h)');
 				return;
 			}
-			this.terminalika(argv.slice(1));
+			await this.terminalika(argv.slice(1));
 		}
 
-		terminalika(args: string[]) {
+		async terminalika(args: string[]) {
 			// Go `flag` parsing: -x, --x, -x=v, --x v (string flags only).
 			const opts: Record<string, string | boolean> = {};
 			for (let i = 0; i < args.length; i++) {
 				const a = args[i];
-				if (!a.startsWith('-')) {
-					// Positional args are ignored by flag.Parse; the binary ignores them too.
-					continue;
-				}
+				if (!a.startsWith('-')) continue;
 				if (a === '-h' || a === '--help' || a === '-help') return this.usage();
 				const body = a.replace(/^-{1,2}/, '');
 				const eq = body.indexOf('=');
@@ -273,11 +308,10 @@ const { title = '~', version = 'v0.3.2' } = Astro.props;
 				return;
 			}
 
-			const ws = 'ws' in opts ? (opts.ws as string) : '127.0.0.1:8080';
-			const watching = [opts.claude && 'Claude Code', opts.pi && 'pi'].filter(Boolean) as string[];
+			const ignored = ['claude', 'pi', 'ws'].filter((f) => f in opts);
+			if (ignored.length) this.print('muted', `(${ignored.map((f) => '--' + f).join(', ')} accepted but inert in the browser: no agent sessions, no sidecar)`);
 
-			if (game === undefined) return this.menu(ws, watching);
-			this.game(game as Game, ws, watching);
+			await this.play(game ? [`--game=${game}`] : []);
 		}
 
 		usage() {
@@ -288,36 +322,29 @@ const { title = '~', version = 'v0.3.2' } = Astro.props;
 			}
 		}
 
-		menu(ws: string, watching: string[]) {
-			this.print('output', '');
-			this.print('ok', `  terminalika ${this.version}`);
-			this.print('output', '');
-			GAMES.forEach((g, i) => this.print(i === 2 ? 'ok' : 'output', `  ${i === 2 ? '>' : ' '} ${g}`));
-			this.print('output', '');
-			this.print('muted', '  ↑/↓ select · ENTER start · ESC quit');
-			this.footer(ws, watching);
-		}
+		/* ---- running the real thing ------------------------------------ */
 
-		game(game: Game, ws: string, watching: string[]) {
-			const frames: Record<Game, string[]> = {
-				snake: ['┌──────────────────────┐', '│ ▓▓▓▓▓▓▓▓▓▓▓          │', '│          ▓     ●     │', '│          ▓▓▓▓        │', '└──────────────────────┘'],
-				tetris: ['┌──────────┐', '│    ▓▓    │', '│    ▓▓    │', '│ ▓▓▓▓ ▓▓▓▓│', '│▓▓▓▓▓▓▓▓ ▓│', '└──────────┘'],
-				invaders: ['┌──────────────────────┐', '│  ▚▞ ▚▞ ▚▞ ▚▞ ▚▞ ▚▞   │', '│   ▚▞ ▚▞ ▚▞ ▚▞ ▚▞     │', '│           |          │', '│          ▟█▙         │', '└──────────────────────┘'],
-				pong: ['┌──────────────────────┐', '│▌         ·          ▐│', '│▌      ●             ▐│', '│          ·           │', '└──────────────────────┘'],
-			};
-			this.print('output', '');
-			for (const row of frames[game]) this.print('ok', '  ' + row);
-			this.print('output', '');
-			if (watching.length) this.print('warn', `  Paused by ${watching.includes('Claude Code') ? 'Claude' : 'PI'}   (SPACE resume)`);
-			this.print('muted', `  ${game} · ESC menu · R reset · SPACE pause`);
-			this.footer(ws, watching);
-		}
-
-		footer(ws: string, watching: string[]) {
-			this.print('output', '');
-			this.print('muted', ws ? `  sidecar: ws://${ws}  (ws.json in the config dir)` : '  sidecar: disabled');
-			if (watching.length) this.print('muted', `  watching: ${watching.join(' + ')} → pauses when the agent settles`);
-			this.print('muted', '  this is a preview — install the real thing: /install');
+		async play(args: string[]) {
+			if (this.playing) return;
+			this.playing = true;
+			this.print('muted', `loading terminalika…`);
+			try {
+				await loadPlayScripts();
+				if (!window.terminalikaPlay) throw new Error('player did not initialise');
+				this.root.dataset.mode = 'play';
+				this.game.hidden = false;
+				await window.terminalikaPlay(this.game, args);
+				this.print('muted', 'terminalika exited');
+			} catch (err) {
+				this.print('error', `terminalika: ${err instanceof Error ? err.message : String(err)}`);
+			} finally {
+				this.root.dataset.mode = 'shell';
+				this.game.hidden = true;
+				this.game.replaceChildren();
+				this.playing = false;
+				this.render();
+				this.focus();
+			}
 		}
 	}
 
