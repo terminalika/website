@@ -629,12 +629,13 @@ dialog[aria-label] {
 	font: inherit;
 	color: var(--tk-fg-dim);
 }
-/* Fixed height: 24 rows of the game grid (1rem line-height) + padding. The
-   shell scrolls inside it; the game fills it. */
+/* Fixed height: 30 rows of the game grid (1rem line-height) + padding. The
+   shell scrolls inside it; the game fills it. Tetris needs ≥ 26 rows (20-row
+   board centred + status line two below it). */
 .tk-term__screen {
 	position: relative;
 	box-sizing: border-box;
-	height: 25.5rem;
+	height: 31.5rem;
 	padding: 0.75rem 1rem;
 	overflow-y: auto;
 }
