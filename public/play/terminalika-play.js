@@ -1,7 +1,8 @@
 // terminalika-play.js — runs the WebAssembly build of terminalika inside a
 // <pre> on the page.
 //
-// The renderer half (drawCell/show/…) is derived from tcell's webfiles/tcell.js:
+// The protocol (which globals tcell's Go side calls and registers) is that of
+// tcell's webfiles/tcell.js:
 //
 //   Copyright 2024 The TCell Authors
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +13,24 @@
 //   distributed under the License is distributed on an "AS IS" BASIS,
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //
-// Changes from upstream: the terminal element is passed in instead of looked
-// up by id, key listeners live on that element (not the document), keyup is
-// relayed as a release (meta=true — see wasm/engine.go), the grid size comes
-// from the element's box, nothing touches document.title, and the whole thing
-// is wrapped in `window.terminalikaPlay(el, args)` returning a Promise that
-// resolves when the Go program exits.
+// The renderer is not: upstream builds a fresh <span> per dirty cell and
+// re-appends every row on each show(), which at the launcher's 125 Hz frame
+// rate with a game that redraws ~200 cells per frame (Invaders, Pong) means
+// thousands of DOM nodes per second and a full reflow per frame — enough to
+// hang the tab. Here the grid is a fixed set of <span>s created once per
+// resize; drawCell mutates the one cell in place and show() only moves the
+// cursor. Nothing is allocated per frame.
 //
-// tcell's Go side calls these globals: resize, clearScreen, drawCell, show,
-// showCursor, setCursorStyle, beep, setTitle. It registers: onKeyEvent,
-// onMouseClick, onMouseMove, onFocus, onPaste.
+// Other differences: the terminal element is passed in instead of looked up
+// by id, key listeners live on that element (not the document), keyup is
+// relayed as a release (meta=true — see wasm/engine.go), the grid size comes
+// from the element's box, nothing touches document.title, and the whole
+// thing is wrapped in `window.terminalikaPlay(el, args)` returning a Promise
+// that resolves when the Go program exits.
+//
+// Go calls: resize, clearScreen, drawCell, show, showCursor, setCursorStyle,
+// beep, setTitle. Go registers: onKeyEvent, onMouseClick, onMouseMove,
+// onFocus, onPaste.
 (function () {
 	const WASM_URL = '/play/terminalika.wasm';
 	const BEEP_URL = '/play/beep.wav';
@@ -29,120 +38,114 @@
 	let term = null; // the <pre> currently rendered into
 	let width = 80;
 	let height = 24;
-	let cx = -1;
+	let cells = []; // cells[y][x] -> <span>, persistent
+	let cx = -1; // cursor position as requested by Go
 	let cy = -1;
+	let shownX = -1; // cursor position currently painted
+	let shownY = -1;
 	let cursorClass = 'cursor-blinking-block';
 	let cursorColor = '';
-	let content; // {data: row[height], dirty: bool}; row = {data: node[width], previous: span|null}
 	let beepAudio = null;
+
+	/* ---- renderer ------------------------------------------------------ */
+
+	function build() {
+		cells = [];
+		if (!term) return;
+		const frag = document.createDocumentFragment();
+		for (let y = 0; y < height; y++) {
+			const row = document.createElement('span');
+			const line = new Array(width);
+			for (let x = 0; x < width; x++) {
+				const c = document.createElement('span');
+				c.textContent = ' ';
+				row.appendChild(c);
+				line[x] = c;
+			}
+			row.appendChild(document.createTextNode('\n'));
+			frag.appendChild(row);
+			cells.push(line);
+		}
+		term.replaceChildren(frag);
+		shownX = shownY = -1;
+	}
 
 	function resize(w, h) {
 		width = w;
 		height = h;
-		content = { data: new Array(height), dirty: true };
-		for (let i = 0; i < height; i++) content.data[i] = { data: new Array(width), previous: null };
-		clearScreen();
+		build();
+	}
+
+	function resetCell(c) {
+		if (c.textContent !== ' ') c.textContent = ' ';
+		if (c.getAttribute('style')) c.removeAttribute('style');
+		if (c.className) c.className = '';
 	}
 
 	function clearScreen(fg, bg) {
-		if (term && fg && fg >= 0) term.style.color = intToHex(fg);
-		if (term && bg && bg >= 0) term.style.backgroundColor = intToHex(bg);
-		content.dirty = true;
-		for (let i = 0; i < height; i++) {
-			content.data[i].previous = null;
-			for (let j = 0; j < width; j++) content.data[i].data[j] = document.createTextNode(' ');
-		}
+		if (term && typeof fg === 'number' && fg >= 0) term.style.color = intToHex(fg);
+		if (term && typeof bg === 'number' && bg >= 0) term.style.backgroundColor = intToHex(bg);
+		for (const line of cells) for (const c of line) resetCell(c);
+		shownX = shownY = -1;
 	}
 
+	const UNDERLINES = ['', 'underline', 'double_underline', 'curly_underline', 'dotted_underline', 'dashed_underline'];
+
 	function drawCell(x, y, s, fg, bg, attrs, us, uc) {
-		const span = document.createElement('span');
-		let use = false;
+		const c = cells[y] && cells[y][x];
+		if (!c) return;
+
 		if ((attrs & (1 << 2)) !== 0) {
+			// reverse video
 			const t = bg;
 			bg = fg;
 			fg = t;
-			use = true;
 		}
-		if (fg !== -1) {
-			span.style.color = intToHex(fg);
-			use = true;
-		}
-		if (bg !== -1) {
-			span.style.backgroundColor = intToHex(bg);
-			use = true;
-		}
-		if (attrs !== 0) {
-			use = true;
-			if (attrs & 1) span.classList.add('bold');
-			if (attrs & (1 << 4)) span.classList.add('dim');
-			if (attrs & (1 << 5)) span.classList.add('italic');
-			if (attrs & (1 << 6)) span.classList.add('strikethrough');
-		}
-		if (us !== 0) {
-			use = true;
-			span.classList.add(['', 'underline', 'double_underline', 'curly_underline', 'dotted_underline', 'dashed_underline'][us] || 'underline');
-			if (uc !== -1) span.style.textDecorationColor = intToHex(uc);
-		}
-		const text = document.createTextNode(s);
-		if ((attrs & (1 << 1)) !== 0) {
-			const blink = document.createElement('span');
-			blink.classList.add('blink');
-			blink.appendChild(text);
-			span.appendChild(blink);
-		} else span.appendChild(text);
 
-		content.dirty = true;
-		content.data[y].previous = null;
-		content.data[y].data[x] = use ? span : text;
+		if (c.textContent !== s) c.textContent = s;
+
+		const color = fg !== -1 ? intToHex(fg) : '';
+		const back = bg !== -1 ? intToHex(bg) : '';
+		if (c.style.color !== color) c.style.color = color;
+		if (c.style.backgroundColor !== back) c.style.backgroundColor = back;
+		const deco = us !== 0 && uc !== -1 ? intToHex(uc) : '';
+		if (c.style.textDecorationColor !== deco) c.style.textDecorationColor = deco;
+
+		let cls = '';
+		if (attrs & 1) cls += ' bold';
+		if (attrs & (1 << 1)) cls += ' blink';
+		if (attrs & (1 << 4)) cls += ' dim';
+		if (attrs & (1 << 5)) cls += ' italic';
+		if (attrs & (1 << 6)) cls += ' strikethrough';
+		if (us !== 0) cls += ' ' + (UNDERLINES[us] || 'underline');
+		if (shownX === x && shownY === y) cls += ' ' + cursorClass;
+		cls = cls.trim();
+		if (c.className !== cls) c.className = cls;
 	}
 
 	function show() {
-		if (!content.dirty || !term) return;
-		displayCursor();
-		term.replaceChildren();
-		for (const row of content.data) {
-			if (row.previous == null) {
-				row.previous = document.createElement('span');
-				for (const c of row.data) row.previous.appendChild(c);
-				row.previous.appendChild(document.createTextNode('\n'));
-			}
-			term.appendChild(row.previous);
+		if (shownX === cx && shownY === cy) return;
+		const old = cells[shownY] && cells[shownY][shownX];
+		if (old) old.classList.remove(cursorClass);
+		shownX = cx;
+		shownY = cy;
+		const cur = cells[cy] && cells[cy][cx];
+		if (cur) {
+			term.style.setProperty('--cursor-color', cursorColor || 'lightgrey');
+			cur.classList.add(cursorClass);
 		}
-		content.dirty = false;
 	}
 
 	function showCursor(x, y) {
-		content.dirty = true;
-		if (!(cx < 0 || cy < 0)) {
-			content.data[cy].previous = null;
-			const c = content.data[cy].data[cx];
-			if (c.classList) c.classList.remove(cursorClass);
-		}
 		cx = x;
 		cy = y;
 	}
 
-	function displayCursor() {
-		content.dirty = true;
-		if (cx < 0 || cy < 0) return;
-		content.data[cy].previous = null;
-		if (!content.data[cy].data[cx].classList) {
-			const span = document.createElement('span');
-			span.appendChild(content.data[cy].data[cx]);
-			content.data[cy].data[cx] = span;
-		}
-		term.style.setProperty('--cursor-color', cursorColor || 'lightgrey');
-		content.data[cy].data[cx].classList.add(cursorClass);
-	}
-
 	function setCursorStyle(newClass, newColor) {
 		if (newClass === cursorClass && newColor === cursorColor) return;
-		if (!(cx < 0 || cy < 0)) {
-			content.dirty = true;
-			content.data[cy].previous = null;
-			const c = content.data[cy].data[cx];
-			if (c.classList) c.classList.remove(cursorClass);
-		}
+		const cur = cells[shownY] && cells[shownY][shownX];
+		if (cur) cur.classList.remove(cursorClass);
+		shownX = shownY = -1; // repaint with the new class on next show()
 		cursorClass = newClass;
 		cursorColor = newColor;
 	}
@@ -161,8 +164,14 @@
 		/* the page keeps its own title */
 	}
 
+	const hexCache = new Map();
 	function intToHex(n) {
-		return '#' + (n >>> 0).toString(16).padStart(6, '0').slice(-6);
+		let s = hexCache.get(n);
+		if (!s) {
+			s = '#' + (n >>> 0).toString(16).padStart(6, '0').slice(-6);
+			hexCache.set(n, s);
+		}
+		return s;
 	}
 
 	Object.assign(window, { resize, clearScreen, drawCell, show, showCursor, setCursorStyle, beep, setTitle });
@@ -171,6 +180,8 @@
 	for (const name of ['onKeyEvent', 'onMouseClick', 'onMouseMove', 'onFocus', 'onPaste']) {
 		if (typeof window[name] !== 'function') window[name] = () => {};
 	}
+
+	/* ---- host -------------------------------------------------------------- */
 
 	/** Measure the cell grid that fits `el` (rows are fixed by its height). */
 	function measure(el) {
@@ -236,7 +247,6 @@
 		window.tkTermSize = { cols, rows };
 		cx = cy = -1;
 		resize(cols, rows);
-		show();
 
 		const onKeyDown = (e) => {
 			if (IGNORED_KEYS.has(e.key)) return;
@@ -272,6 +282,7 @@
 			el.removeEventListener('focus', onFocusIn);
 			for (const name of ['onKeyEvent', 'onMouseClick', 'onMouseMove', 'onFocus', 'onPaste']) window[name] = () => {};
 			term = null;
+			cells = [];
 			running = false;
 		}
 	};

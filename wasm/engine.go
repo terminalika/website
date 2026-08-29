@@ -16,8 +16,10 @@ import (
 const releaseMod = tcell.ModMeta
 
 const (
-	// framePeriod paces update + draw, as in the launcher.
-	framePeriod = 8 * time.Millisecond
+	// framePeriod paces update + draw. The launcher runs at 8 ms to shave
+	// synthesised key-release latency; the browser reports real releases,
+	// and paints at 60 Hz anyway, so 16 ms halves the work for nothing lost.
+	framePeriod = 16 * time.Millisecond
 	// holdTimeout is the watchdog for a key whose keyup never arrives (the
 	// tab lost focus mid-hold, for instance); the browser normally reports
 	// every release, so this is only a safety net.

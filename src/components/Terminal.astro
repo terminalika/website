@@ -119,6 +119,10 @@ const { title = '~', version = 'v0.3.2' } = Astro.props;
 			this.print('muted', `terminalika ${this.version} · a shell that only knows one command`);
 			this.print('muted', 'type terminalika, press Tab to complete, Enter to run. the games are real.');
 			this.render();
+
+			// Deep link: /?play (menu) or /?play=snake runs the command on load.
+			const play = new URLSearchParams(location.search).get('play');
+			if (play !== null) void this.run(play ? `terminalika --game=${play}` : 'terminalika');
 		}
 
 		focus() {
