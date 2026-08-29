@@ -256,6 +256,18 @@ body::before {
 }
 .hero h1 {
 	font-size: clamp(2rem, 6vw, 3.5rem);
+	font-weight: 700; /* bold, one step up from the top-bar logo */
+	text-transform: lowercase;
+	display: flex;
+	align-items: center;
+	gap: 0.35em;
+}
+.tk-hero-logo {
+	width: 0.9em;
+	height: 0.9em;
+	flex: none;
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
 }
 .sl-markdown-content h2::before {
 	content: '## ';
