@@ -41,6 +41,9 @@ else; `npm run check:theme` (run automatically before `build`) enforces it.
 See `CLAUDE.md`. To add a palette, copy the `data-palette='amber'` blocks
 (dark + light) and set `data-palette` on `<html>`.
 
+Fonts (self-hosted via Fontsource): JetBrains Mono for everything,
+Silkscreen (pixel) for the logo and headings only.
+
 ## shell blocks
 
 ```mdx

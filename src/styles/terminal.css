@@ -13,6 +13,8 @@
    ========================================================================== */
 
 @import '@fontsource-variable/jetbrains-mono';
+@import '@fontsource/silkscreen/400.css';
+@import '@fontsource/silkscreen/700.css';
 
 /* ---- 1. Palette tokens ------------------------------------------------- */
 
@@ -20,6 +22,8 @@
 :root {
 	--tk-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'Cascadia Code',
 		'Fira Code', Menlo, Consolas, monospace;
+	/* Pixel display face for the logo and headings only; never body text. */
+	--tk-font-display: 'Silkscreen', var(--tk-font-mono);
 	--tk-prompt: '$';
 	--tk-cursor: '▌';
 }
@@ -230,10 +234,30 @@ body::before {
 .sl-markdown-content h3,
 .sl-markdown-content h4,
 .content-panel h1 {
-	font-family: var(--tk-font-mono);
-	font-weight: 600;
-	letter-spacing: -0.01em;
+	font-family: var(--tk-font-display);
+	font-weight: 400;
+	letter-spacing: 0.02em;
+	line-height: 1.25;
 	color: var(--tk-accent);
+	/* Pixel fonts want crisp edges, not sub-pixel smoothing. */
+	-webkit-font-smoothing: none;
+	-moz-osx-font-smoothing: unset;
+	text-rendering: optimizeSpeed;
+}
+/* Silkscreen renders large; pull sizes down a notch to keep line lengths sane.
+   Set through Starlight's tokens so the heading, its wrapper and the anchor
+   icon all agree on the size (a mismatch makes the icon overlap the text). */
+:root {
+	--sl-text-h1: 1.9rem;
+	--sl-text-h2: 1.25rem;
+	--sl-text-h3: 1rem;
+	--sl-text-h4: 0.85rem;
+}
+.sl-markdown-content .sl-heading-wrapper {
+	--sl-anchor-icon-gap: 0.5em;
+}
+.hero h1 {
+	font-size: clamp(2rem, 6vw, 3.5rem);
 }
 .sl-markdown-content h2::before {
 	content: '## ';
@@ -250,6 +274,14 @@ body::before {
 /* The splash hero title is big enough already; no prefix there. */
 .hero h1::before {
 	content: none;
+}
+/* Right-hand "On this page" heading matches. */
+.right-sidebar h2 {
+	font-family: var(--tk-font-display);
+	font-weight: 400;
+	font-size: 0.85rem;
+	color: var(--tk-accent);
+	-webkit-font-smoothing: none;
 }
 
 /* Scrollbars in the page palette (code blocks, tables, shell blocks). */
@@ -318,9 +350,13 @@ header.header {
 	background: var(--tk-bg);
 }
 .site-title {
-	font-family: var(--tk-font-mono);
-	font-weight: 600;
+	font-family: var(--tk-font-display);
+	font-weight: 400;
+	font-size: 1.1rem;
+	letter-spacing: 0.04em;
 	color: var(--tk-accent);
+	-webkit-font-smoothing: none;
+	-moz-osx-font-smoothing: unset;
 }
 .site-title::before {
 	content: var(--tk-prompt) ' ';

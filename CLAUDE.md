@@ -34,6 +34,15 @@ driven by `data-theme` on `<html>`). To keep both modes complete:
 `scripts/check-theme.mjs` enforces 1–3 mechanically and fails
 `npm run build` on violations. Run it after any change to `terminal.css`.
 
+## Typography
+
+- Body, code, UI: `--tk-font-mono` (JetBrains Mono).
+- Logo (`.site-title`) and headings (h1–h4, hero, "On this page"):
+  `--tk-font-display` (Silkscreen, a pixel font). Never use it for body
+  text, tables or anything below ~0.85rem; it becomes unreadable.
+- Both fonts are self-hosted via Fontsource imports at the top of
+  `terminal.css`; do not add Google Fonts `<link>`s.
+
 ## Content conventions
 
 - Pages are lowercase, terminal-style (`flags`, `config.json`, `zellij`).
