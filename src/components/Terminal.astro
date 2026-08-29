@@ -14,10 +14,13 @@
  * Flag parsing and error strings mirror the Go binary (`main.go` + the Go
  * `flag` package), so what you see here is what the real one says.
  */
+import { latestVersion } from '../lib/version';
+
 interface Props {
+	/** defaults to the latest published release, fetched at build time */
 	version?: string;
 }
-const { version = 'v0.3.2' } = Astro.props;
+const { version = latestVersion } = Astro.props;
 ---
 
 <div class="tk-term not-content" data-version={version} data-mode="shell" tabindex="0" aria-label="Interactive terminal, only the terminalika command is available">

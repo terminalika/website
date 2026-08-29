@@ -1,0 +1,19 @@
+---
+/**
+ * The install page's "did it work" demo. A thin wrapper around <Shell> so
+ * the `terminalika --version` line in its fake output stays truthful
+ * without anyone having to remember to update it after a release.
+ */
+import Shell from './Shell.astro';
+import { latestVersion } from '../lib/version';
+---
+
+<Shell
+	title="verify"
+	lines={[
+		{ type: 'input', text: 'terminalika --version' },
+		{ type: 'ok', text: latestVersion },
+		{ type: 'input', text: 'terminalika --game=snake', delay: 400 },
+		{ type: 'comment', text: '# terminal goes full-screen; ESC returns to the menu, ESC again quits' },
+	]}
+/>
