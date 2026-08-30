@@ -94,6 +94,25 @@ That is your terminal (or multiplexer), not the game. Terminalika needs a
 terminal that reports key releases; see [terminals/key-releases](/terminals/).
 :::
 
+## updating
+
+terminalika does not update itself, and there is no repository to subscribe
+to. Every install command on this page resolves to the latest release, so
+updating is re-running the one you used:
+
+| Installed with                     | Update with                                              |
+| ---------------------------------- | -------------------------------------------------------- |
+| Homebrew                           | `brew upgrade --cask terminalika`                        |
+| Scoop                              | `scoop update terminalika`                               |
+| Go                                 | `go install github.com/terminalika/terminalika@latest`   |
+| a distro package (deb/rpm/zst/apk) | the same two lines from [linux packages](#linux-packages) |
+| a raw binary                       | the same three lines from [raw binaries](#raw-binaries)  |
+
+`terminalika -version` prints what you are running; the
+[releases page](https://github.com/terminalika/terminalika/releases/latest)
+shows what is current. Your `config.json` and high scores live in your
+config directory, which no update path touches.
+
 ## next
 
 - [usage/flags](/usage/flags/): everything the binary accepts on the command line.
