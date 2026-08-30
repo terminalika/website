@@ -3,7 +3,7 @@ title: research
 description: What interruption and attention research says about the small waits an AI agent creates - the studies behind terminalika's design, with their actual numbers and their limits.
 ---
 
-terminalika's premise is that a 30-second wait on an AI agent is a
+terminalika's premise is that a one-to-two-minute wait on an AI agent is a
 dangerous moment: too short to work, too long to sit still, and the easiest
 door out of the terminal. That premise isn't a hunch. Human-computer
 interaction and organisational psychology have been measuring the cost of
@@ -103,7 +103,7 @@ most recent studies. Roughly half of switches are self-interruptions -
 nobody pinged you; you just went.
 
 *What terminalika takes from it:* the self-interruption is the one to
-design for. The agent will take 20-90 seconds; that is longer than the
+design for. The agent will take a minute or three; that is several times the
 average screen dwell. Something has to occupy that gap or the browser will.
 
 ## 6. waiting on the AI is now a real part of the workday
