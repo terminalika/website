@@ -12,10 +12,10 @@ Holding a key down does not produce a "key is down" state; it produces the
 terminal's own **auto-repeat**: one event, a pause, then a burst of events,
 and nothing at all when you let go.
 
-For a text editor that is fine. For a paddle or a cannon that should move
-*while* the key is held and stop *when* it is released, it is not: the game
-cannot tell "still held" from "released", so movement either stutters or
-overshoots. That is what "sticky" means in the warning screen.
+For a text editor that is fine. For a game element that should move *while*
+the key is held and stop *when* it is released - pong's paddles, say - it is
+not: the game cannot tell "still held" from "released", so movement either
+stutters or overshoots. That is what "sticky" means in the warning screen.
 
 ## the fix: real release events
 
@@ -78,6 +78,13 @@ probably inside a multiplexer; see the two pages above.
 
 ## the warning screen
 
-When releases are unavailable a short notice is shown before the menu. It
-names the reason (your terminal, zellij, or tmux) and links to the matching
-page here. Press any key to continue; the game runs with the fallback.
+Not every game cares about held keys: most move one step per keypress and
+never read "still held" state, so they are unaffected no matter the
+terminal. Only a game that reads held-key state (currently pong, for its
+paddles) is affected, and only that game shows the notice - right when it
+starts, not at launcher startup.
+
+When releases are unavailable and the game you picked is affected, a short
+notice names the reason (your terminal, zellij, or tmux), the control that
+will feel sticky, and links to the matching page here. Press any key to
+continue; the game runs with the fallback.

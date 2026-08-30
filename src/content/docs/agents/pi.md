@@ -29,7 +29,8 @@ The flag and the config field are OR-ed; either is enough.
   "pi": {
     "subscribe": true,
     "dir": "/home/me/my-project",   // optional: only the pi running in this directory
-    "session": ""                   // optional: an explicit session file, overrides "dir"
+    "session": "",                  // optional: an explicit session file, overrides "dir"
+    "message": ""                   // optional: custom pause text, after the fixed "Paused: " prefix
   }
 }
 ```
@@ -39,6 +40,7 @@ The flag and the config field are OR-ed; either is enough.
 | `subscribe` | Enable the watcher.                                                                |
 | `dir`       | Restrict to sessions of the pi whose working directory is this path. Unset = every project. |
 | `session`   | Watch exactly this session file. Wins over `dir`.                                  |
+| `message`   | Pause overlay text shown after the fixed `Paused: ` prefix. Defaults to `PI's done, you're up.`. |
 
 ## where sessions are read from
 
@@ -58,10 +60,11 @@ appended *after* the game started count.
 The game receives:
 
 ```json
-{"kind":"command", "type":"snake.pause", "payload":{"reason":"Paused by PI"}}
+{"kind":"command", "type":"snake.pause", "payload":{"reason":"Paused: PI's done, you're up."}}
 ```
 
-so the pause overlay reads **Paused by PI**. `SPACE` resumes.
+so the pause overlay reads **Paused: PI's done, you're up.** (or your custom
+`message`). `SPACE` resumes.
 
 ## with Claude Code too
 
@@ -70,4 +73,4 @@ terminalika --pi --claude
 ```
 
 Either agent settling pauses the game. Both watchers share the single
-[listener seat](/agents/#one-listener-at-a-time).
+[listener seat](/agents/#one-window-at-a-time).

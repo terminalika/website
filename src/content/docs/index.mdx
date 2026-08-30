@@ -1,6 +1,6 @@
 ---
 title: terminalika
-description: A tiny terminal game launcher for developers who want something nostalgic to do while their AI agents are working.
+description: Retro games for your terminal, for the very modern problem of waiting on an AI agent. It pauses the moment the agent needs you.
 template: splash
 hero:
   title: '<img class="tk-hero-logo" src="/logo.svg" alt="" width="96" height="96" />terminalika'
@@ -15,30 +15,139 @@ hero:
       variant: minimal
 ---
 
+import { Card, CardGrid, Steps } from '@astrojs/starlight/components';
 import Terminal from '../../components/Terminal.astro';
 
 <Terminal />
 
-## what it is
+## why you need this
 
-`terminalika` is a single static binary that opens a minimalist menu of built-in games and runs the one you pick, full-screen, in the terminal you already have open. It is written in Go on top of [tcell](https://github.com/gdamore/tcell) and ships as `.deb`, `.rpm`, Arch package, Homebrew cask, Scoop manifest and raw binaries for Linux, macOS and Windows.
+You kick off a task. The agent goes quiet for twenty seconds. Twenty seconds
+is too short to do anything and too long to do nothing, so you open a tab
+"just to check". You know how this ends.
 
-The twist: it can **watch your coding agent**. Point it at [Claude Code](/agents/claude/) or [pi](/agents/pi/) and the game pauses itself the moment the agent stops and waits for your input, so you never miss a turn while you are busy losing at Tetris.
+<CardGrid>
+  <Card title="the alt-tab trap" icon="external">
+    **Problem.** The agent goes quiet, you open a tab "just to check".
+    Forty minutes later it has spent 39 of them waiting on a prompt you
+    never saw - and half your brain is still in that tab.
 
-## quick start
+    **terminalika.** The wait stays in the terminal, in a game that pauses
+    *itself* when the agent is back and says who wants what. You were never
+    more than one keypress from the prompt.
+  </Card>
+  <Card title="leaving your dev environment" icon="laptop">
+    **Problem.** Outside your dev environment nothing is a neutral place to
+    wait: a YouTube tab, Instagram on your phone, a Slack thread, a Reddit
+    feed. Every one of them is better at keeping you than your agent is at
+    calling you back.
 
-```sh
-# Homebrew (macOS / Linux)
-brew tap terminalika/tap && brew install --cask terminalika
+    **terminalika.** Never leave your environment: the wait, the notice and
+    the way back (ESC) are all in the pane next to your agent. Away from the
+    desk? A desktop notification and a background listener.
+  </Card>
+</CardGrid>
 
-# open the menu
-terminalika
+## how it works
 
-# or jump straight into a game
-terminalika --game=tetris
-```
+<Steps>
 
-Other platforms and package formats: [install](/install/).
+1. **The agent works. You play.**
+
+   Start a task in Claude Code, Pi, Aider or Cursor, open `terminalika` in
+   the next pane and pick Snake, Tetris, Space Invaders or Pong. They are
+   built to be dropped mid-move; that's the point.
+
+2. **It listens for the agent.**
+
+   terminalika tails the agent's own session files - no hooks, no proxy,
+   nothing leaves your machine (Cursor and anything else post one line from
+   a hook). Two events matter: *finished* and *needs your input*. Either
+   one freezes the game with a one-line notice in the agent's colour.
+
+3. **Back in one keypress.**
+
+   ESC, answer the agent, come back whenever. The game and your score are
+   where you left them. Not at the terminal? A desktop notification, and a
+   small background process that keeps listening after every window is
+   closed.
+
+</Steps>
+
+## the science of the small wait
+
+Interruption research has measured "just checking" for twenty years: about
+23 minutes to get back to an interrupted task, 10-15 minutes before a
+developer edits code again, and a screen attention span now around 47
+seconds. terminalika doesn't make the wait shorter; it keeps it from
+turning into an interruption. [The studies, and what they actually say →](/research/)
+
+## faq
+
+<div class="tk-faq">
+<details>
+<summary>Does it slow down or interfere with my agent?</summary>
+
+No. It reads the transcript files the agent already writes to disk. No
+proxy, nothing injected, nothing sent anywhere.
+
+</details>
+<details>
+<summary>Which agents?</summary>
+
+Claude Code, Pi Agent and Aider natively. Cursor CLI - and any tool with a
+hook - through `terminalika notify`. See [agents](/agents/).
+
+</details>
+<details>
+<summary>Do I have to play a game?</summary>
+
+No. Say yes to "keep running in the background" and you have a notification
+service; open the window only when you feel like a round of Tetris.
+
+</details>
+<details>
+<summary>Will it pause for every little thing?</summary>
+
+Two events only: the agent *finished*, or it *needs your input*. Tool calls
+and subagent chatter are ignored; the same event within three seconds is
+deduplicated.
+
+</details>
+<details>
+<summary>Where do notifications show up?</summary>
+
+Always in the game. On the desktop, when you choose: only while the window
+isn't focused (default), always, only when no window is open, or never.
+
+</details>
+<details>
+<summary>Can I answer the agent from inside the game?</summary>
+
+Not today - ESC and you're one pane away. Bringing the question itself into
+the overlay is where this is heading.
+
+</details>
+<details>
+<summary>tmux? zellij? Windows?</summary>
+
+All three. Held keys feel best in a terminal that reports key releases;
+[terminals](/terminals/) has the list and the fixes.
+
+</details>
+<details>
+<summary>Is it free?</summary>
+
+MIT-licensed, one static binary, no account.
+
+</details>
+<details>
+<summary>Why is the logo lowercase?</summary>
+
+Because it lives in a terminal.
+
+</details>
+</div>
 
 ## where to go next
 

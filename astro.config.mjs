@@ -5,11 +5,15 @@ import starlight from '@astrojs/starlight';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://terminalika.dev',
+	// The setup wizard and `terminalika notify --help` print this short URL.
+	redirects: {
+		'/docs/events': '/events/',
+	},
 	integrations: [
 		starlight({
 			title: 'terminalika',
 			description:
-				'A tiny terminal game launcher for developers who want something nostalgic to do while their AI agents are working.',
+				'An event-driven focus hub for CLI AI agents: get notified the moment an agent finishes or needs you, with a retro game library for the wait.',
 			favicon: '/logo-large-canvas.png',
 			logo: { src: './src/assets/logo.svg', alt: '' },
 			social: [
@@ -58,6 +62,7 @@ export default defineConfig({
 			sidebar: [
 				{ label: 'terminalika', slug: '' },
 				{ label: 'install', slug: 'install' },
+				{ label: 'research', slug: 'research' },
 				{
 					label: 'usage/',
 					items: [
@@ -83,6 +88,7 @@ export default defineConfig({
 						{ label: 'tmux', slug: 'terminals/tmux' },
 					],
 				},
+				{ label: 'events', slug: 'events' },
 				{ label: 'websocket', slug: 'websocket' },
 				{ label: 'development', slug: 'development' },
 			],

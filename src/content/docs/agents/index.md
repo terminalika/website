@@ -8,14 +8,19 @@ grinds through a task, **without** missing the moment it finishes and waits
 for your answer. So the launcher can subscribe to an agent's session and
 pause the game the instant the agent settles.
 
-Supported agents:
+Supported agents (pick any combination in the setup wizard, or with
+`--agents`):
 
-| Agent                                  | Flag       | Config block | Page                          |
-| -------------------------------------- | ---------- | ------------ | ----------------------------- |
-| Claude Code                            | `--claude` | `"claude"`   | [agents/claude](/agents/claude/) |
-| pi                                     | `--pi`     | `"pi"`       | [agents/pi](/agents/pi/)      |
+| Agent                                  | id       | Detection                          | Page                          |
+| -------------------------------------- | -------- | ---------------------------------- | ----------------------------- |
+| Claude Code                            | `claude` | session transcripts (+ hooks)      | [agents/claude](/agents/claude/) |
+| Pi Agent                               | `pi`     | session files                      | [agents/pi](/agents/pi/)      |
+| Aider                                  | `aider`  | chat history (+ notifications command) | [events](/events/#aider)  |
+| Cursor CLI                             | `cursor` | `stop` hook → `terminalika notify` | [events](/events/#cursor-cli-hooks) |
 
-Both can be on at the same time; either agent settling pauses the game.
+All selected agents are monitored at the same time. The full event model -
+the two event kinds, notification channels, auto-pause, and the webhook any
+tool can post to - is on the [events](/events/) page.
 
 ## how it works
 
@@ -28,8 +33,9 @@ started is skipped.
 
 When that message appears the launcher sends the running game a
 `<game>.pause` command with a reason, so the overlay reads
-`Paused by Claude` or `Paused by PI`. Press `SPACE` to resume when you come
-back.
+`Paused: Claude's done, you're up.` or `Paused: PI's done, you're up.`
+(customizable via each agent's `message` config field). Press `SPACE` to
+resume when you come back.
 
 ```sh
 terminalika --game=snake --claude
@@ -49,28 +55,12 @@ the pause. To narrow it, set in the config:
 - `dir`: only the agent whose working directory is this path;
 - `session`: exactly this session file (overrides `dir`).
 
-## one listener at a time
+## one window at a time
 
-You can run several terminalika windows, but only **one** may listen for
-agent events, regardless of which agent(s) it watches; a single agent
-finishing should pause a single screen, not all of them.
-
-- The first instance started with `--claude` / `--pi` (or `subscribe` in the
-  config) takes the *listener seat* silently.
-- A second one asks:
-
-  ```
-  Another terminalika window is currently listening
-  for agent events (pi / Claude Code).
-
-  Move event listening to this window instead?
-  ```
-
-  Accept to move listening here; decline and this window plays without
-  pausing on any agent event.
-- An instance started with neither flag never asks and never pauses.
-
-The seat is recorded in `listener.json` in the config directory with a
-heartbeat, so a crashed holder is reclaimed automatically instead of asking
-forever. If the seat is taken over while you are mid-game, that window stops
-reacting to agent events immediately.
+Only one terminalika window is open at a time, whichever agents it watches:
+a single agent finishing should pause a single screen. Opening a second
+window takes over - the first closes itself within a couple of seconds and
+the new one shows a short notice saying so. Between windows (and from login,
+if you said yes in setup) a background `terminalika daemon` keeps listening
+and sends the desktop notifications. Details:
+[windows and the background daemon](/events/#windows-and-the-background-daemon).

@@ -9,20 +9,38 @@ These are intercepted by the launcher before any game sees them:
 
 | Key     | Action                                              |
 | ------- | --------------------------------------------------- |
-| `ESC`   | Leave the game and return to the menu. In the menu: quit. |
+| `ESC`   | Leave the game and return to the home screen. On the home screen: quit. |
 | `R`     | Reset the current game.                             |
 | `SPACE` | Pause / resume the current game.                    |
 
 Everything else (arrows, `WASD`, per-game keys) is forwarded to the running
 game.
 
-## menu
+## home screen
 
-| Key            | Action            |
-| -------------- | ----------------- |
-| `↑` / `↓`, `k` / `j` | Move selection |
-| `ENTER`        | Start the selected game |
-| `ESC`, `q`, `Ctrl-C` | Quit        |
+The landing screen shows only the animated hero and a one-line prompt; the
+game library is hidden until you ask for it. The layout adapts to the
+terminal: on a small window (a quarter of a screen, say) the big title
+becomes one line and the card grid becomes a compact, scrollable list, so
+every game stays reachable.
+
+| Key                  | Action                                                         |
+| -------------------- | -------------------------------------------------------------- |
+| any letter           | Type-to-launch: opens the fuzzy search overlay (`sn` → snake). |
+| `↓`, `j`, `ENTER`    | Slide the hero up and reveal the game library.                 |
+| `←` `→` `↑` `↓`      | Move between game cards; `↑` on the top row hides the library again. |
+| `ENTER`              | Launch the selected game / the top search match.               |
+| `ESC`                | Close the search overlay, hide the library, or (hero) quit.    |
+| `q`, `Ctrl-C`        | Quit.                                                          |
+
+## setup wizard
+
+| Key            | Action                          |
+| -------------- | ------------------------------- |
+| `↑` / `↓`      | Move between options            |
+| `SPACE`, `x`   | Toggle the option               |
+| `ENTER`, `→`   | Next step (last step: save)     |
+| `ESC`, `←`     | Previous step (first step: quit)|
 
 Per-game controls are listed in [usage/games](/usage/games/).
 

@@ -370,6 +370,53 @@ body::before {
 	background: var(--tk-bg-panel);
 }
 
+/* FAQ: <details> rows on the home page. The question is the row; the
+   answer unfolds under it. The marker is a shell-style prompt that turns
+   from `>` to `v` when open. */
+.tk-faq {
+	display: grid;
+	gap: 0;
+	border-top: 1px solid var(--tk-border);
+}
+.tk-faq details {
+	border-bottom: 1px solid var(--tk-border);
+}
+.tk-faq summary {
+	cursor: pointer;
+	list-style: none;
+	display: flex;
+	gap: 0.75rem;
+	align-items: baseline;
+	padding: 0.7rem 0.25rem;
+	color: var(--tk-fg);
+	font-weight: 600;
+}
+.tk-faq summary::-webkit-details-marker {
+	display: none;
+}
+.tk-faq summary::before {
+	content: '>';
+	color: var(--tk-accent);
+	font-weight: 700;
+	flex: none;
+	width: 1ch;
+}
+.tk-faq details[open] summary::before {
+	content: 'v';
+}
+.tk-faq summary:hover,
+.tk-faq details[open] summary {
+	color: var(--tk-accent);
+}
+.tk-faq summary:focus-visible {
+	outline: 1px solid var(--tk-accent);
+	outline-offset: 2px;
+}
+.tk-faq details > :not(summary) {
+	margin: 0 0.25rem 0.9rem 1.75ch;
+	color: var(--tk-fg-dim);
+}
+
 /* Code frames from Expressive Code: square, no shadow. */
 .expressive-code .frame {
 	border-radius: 0 !important;

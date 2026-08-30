@@ -29,7 +29,8 @@ The flag and the config field are OR-ed; either is enough.
   "claude": {
     "subscribe": true,
     "dir": "/home/me/my-project",   // optional: only this project's Claude Code
-    "session": ""                   // optional: an explicit transcript file, overrides "dir"
+    "session": "",                  // optional: an explicit transcript file, overrides "dir"
+    "message": ""                   // optional: custom pause text, after the fixed "Paused: " prefix
   }
 }
 ```
@@ -39,6 +40,7 @@ The flag and the config field are OR-ed; either is enough.
 | `subscribe` | Enable the watcher.                                                                      |
 | `dir`       | Restrict to sessions of the Claude Code instance whose working directory is this path. Unset = every project. |
 | `session`   | Watch exactly this session file. Wins over `dir`.                                        |
+| `message`   | Pause overlay text shown after the fixed `Paused: ` prefix. Defaults to `Claude's done, you're up.`. |
 
 ## where sessions are read from
 
@@ -56,10 +58,11 @@ count.
 The game receives:
 
 ```json
-{"kind":"command", "type":"snake.pause", "payload":{"reason":"Paused by Claude"}}
+{"kind":"command", "type":"snake.pause", "payload":{"reason":"Paused: Claude's done, you're up."}}
 ```
 
-so the pause overlay reads **Paused by Claude**. `SPACE` resumes.
+so the pause overlay reads **Paused: Claude's done, you're up.** (or your
+custom `message`). `SPACE` resumes.
 
 ## troubleshooting
 
@@ -68,4 +71,4 @@ so the pause overlay reads **Paused by Claude**. `SPACE` resumes.
   there. With `dir` set, the path must match the agent's working directory
   exactly.
 - *It paused in the wrong window.* Only one window listens at a time; see
-  [one listener at a time](/agents/#one-listener-at-a-time).
+  [one listener at a time](/agents/#one-window-at-a-time).

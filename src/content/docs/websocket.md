@@ -64,7 +64,7 @@ Every game accepts `<game>.pause` with an optional `reason`, shown on the
 pause overlay. This is exactly what the [agent watchers](/agents/) use:
 
 ```json
-{"kind":"command", "type":"snake.pause", "payload":{"reason":"Paused by Claude"}}
+{"kind":"command", "type":"snake.pause", "payload":{"reason":"Paused: Claude's done, you're up."}}
 ```
 
 ## example client
