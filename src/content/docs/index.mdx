@@ -15,40 +15,9 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid, Steps } from '@astrojs/starlight/components';
-import Terminal from '../../components/Terminal.astro';
+import { Steps } from '@astrojs/starlight/components';
 
-<Terminal />
-
-## why you need this
-
-You kick off a task. The agent goes quiet for three minutes. Three minutes
-is too short to start anything real and too long to do nothing, so you open
-a tab "just to check". Social media is a twenty-minute trap for a
-three-minute prompt.
-
-<CardGrid>
-  <Card title="the alt-tab trap" icon="external">
-    **Problem.** The agent goes quiet, you open a tab "just to check".
-    Forty minutes later it has spent 39 of them waiting on a prompt you
-    never saw - and half your brain is still in that tab.
-
-    **terminalika.** Claude asks a question → the game pauses itself with a
-    one-line notice → ESC and you're back in code. You were never more than
-    one keypress from the prompt.
-  </Card>
-  <Card title="leaving your dev environment" icon="laptop">
-    **Problem.** Outside your dev environment nothing is a neutral place to
-    wait: a YouTube tab, Instagram on your phone, a Slack thread, a Reddit
-    feed. Every one of them is better at keeping you than your agent is at
-    calling you back.
-
-    **terminalika.** Open it in the pane next to your agent → it tails the
-    agent's own session files → the wait, the notice and the way back are one
-    split away. Away from the desk? A desktop notification and a background
-    listener.
-  </Card>
-</CardGrid>
+<video class="tk-demo" src="/demo.mp4" autoplay loop muted playsinline aria-label="terminalika in the pane next to Claude Code: the game pauses the moment the agent needs you"></video>
 
 ## how it works
 
@@ -67,14 +36,29 @@ three-minute prompt.
    a hook). Two events matter: *finished* and *needs your input*. Either
    one freezes the game with a one-line notice in the agent's colour.
 
-3. **Back in one keypress.**
+3. **The agent is one pane away.**
 
-   ESC, answer the agent, come back whenever. The game and your score are
-   where you left them. Not at the terminal? A desktop notification, and a
+   The game is already paused - switch panes, answer, come back whenever.
+   The game and your score are where you left them. Not at the terminal? A desktop notification, and a
    small background process that keeps listening after every window is
    closed.
 
 </Steps>
+
+## why I built this
+
+<figure class="tk-founder">
+<blockquote>
+I build with AI agents all day, and every wait ended the same way: no ping
+when the agent came back, a "quick" scroll on Instagram, and forty minutes
+later the agent had spent 39 of them waiting on a question I never saw.
+Instagram is better at keeping me than any agent is at calling me back, so
+terminalika started as the terminal games I built and played instead - in
+the pane next to the agent, pausing themselves the moment it needs me.
+One pane over, and I'm back in code.
+</blockquote>
+<figcaption>— Hyvin Hiljaa</figcaption>
+</figure>
 
 ## the science of the small wait
 
@@ -126,7 +110,7 @@ isn't focused (default), always, only when no window is open, or never.
 <details>
 <summary>Can I answer the agent from inside the game?</summary>
 
-Not today - ESC and you're one pane away. Bringing the question itself into
+Not today - the agent is one pane away. Bringing the question itself into
 the overlay is where this is heading.
 
 </details>

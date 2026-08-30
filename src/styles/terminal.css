@@ -370,6 +370,45 @@ body::before {
 	background: var(--tk-bg-panel);
 }
 
+/* Home page demo capture: the agent in one pane, the game in the other. */
+.tk-demo {
+	display: block;
+	width: 100%;
+	margin: 1.5rem 0;
+	border: 1px solid var(--tk-border);
+	background: var(--tk-bg-panel);
+}
+
+/* Founder note on the home page: a quote in the author's own voice.
+   Italic body, accent left bar, dimmed signature; optional small round
+   avatar next to the name. */
+.tk-founder {
+	margin: 1.5rem 0;
+	padding: 0.35rem 0 0.35rem 1.25rem;
+	border-left: 2px solid var(--tk-accent);
+}
+.tk-founder blockquote {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-style: italic;
+	color: var(--tk-fg);
+}
+.tk-founder figcaption {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	margin-top: 0.8rem;
+	color: var(--tk-fg-dim);
+}
+.tk-founder__avatar {
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	border: 1px solid var(--tk-border);
+	object-fit: cover;
+}
+
 /* FAQ: <details> rows on the home page. The question is the row; the
    answer unfolds under it. The marker is a shell-style prompt that turns
    from `>` to `v` when open. */

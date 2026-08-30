@@ -76,7 +76,7 @@ switching, meetings and blocked work.
 *What terminalika takes from it:* programming has an unusually expensive
 resume, so the switch to avoid is the one *out of the code context*. Both
 the game and the notice live in the same terminal, one pane away from the
-agent; ESC is the whole path back.
+agent; switching panes is the whole path back.
 
 ## 4. the alert is the door, not the destination
 
