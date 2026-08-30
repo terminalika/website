@@ -1,10 +1,10 @@
 ---
 title: terminalika
-description: Retro games for your terminal, for the very modern problem of waiting on an AI agent. It pauses the moment the agent needs you.
+description: Stop doomscrolling while waiting for Claude. Stay in your terminal, play a few minutes of Snake, get notified the millisecond your prompt finishes.
 template: splash
 hero:
   title: '<img class="tk-hero-logo" src="/logo.svg" alt="" width="96" height="96" />terminalika'
-  tagline: Retro games for your terminal, for the very modern problem of waiting on an AI agent. It pauses the moment the agent needs you.
+  tagline: Stop doomscrolling while waiting for Claude. Stay in your terminal, play a few minutes of Snake, get notified the millisecond your prompt finishes.
   actions:
     - text: install
       link: /install/
@@ -22,9 +22,10 @@ import Terminal from '../../components/Terminal.astro';
 
 ## why you need this
 
-You kick off a task. The agent goes quiet for twenty seconds. Twenty seconds
-is too short to do anything and too long to do nothing, so you open a tab
-"just to check". You know how this ends.
+You kick off a task. The agent goes quiet for three minutes. Three minutes
+is too short to start anything real and too long to do nothing, so you open
+a tab "just to check". Social media is a twenty-minute trap for a
+three-minute prompt.
 
 <CardGrid>
   <Card title="the alt-tab trap" icon="external">
@@ -32,9 +33,9 @@ is too short to do anything and too long to do nothing, so you open a tab
     Forty minutes later it has spent 39 of them waiting on a prompt you
     never saw - and half your brain is still in that tab.
 
-    **terminalika.** The wait stays in the terminal, in a game that pauses
-    *itself* when the agent is back and says who wants what. You were never
-    more than one keypress from the prompt.
+    **terminalika.** Claude asks a question → the game pauses itself with a
+    one-line notice → ESC and you're back in code. You were never more than
+    one keypress from the prompt.
   </Card>
   <Card title="leaving your dev environment" icon="laptop">
     **Problem.** Outside your dev environment nothing is a neutral place to
@@ -42,9 +43,10 @@ is too short to do anything and too long to do nothing, so you open a tab
     feed. Every one of them is better at keeping you than your agent is at
     calling you back.
 
-    **terminalika.** Never leave your environment: the wait, the notice and
-    the way back (ESC) are all in the pane next to your agent. Away from the
-    desk? A desktop notification and a background listener.
+    **terminalika.** Open it in the pane next to your agent → it tails the
+    agent's own session files → the wait, the notice and the way back are one
+    split away. Away from the desk? A desktop notification and a background
+    listener.
   </Card>
 </CardGrid>
 
