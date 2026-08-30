@@ -62,6 +62,7 @@ type heldKey struct {
 }
 
 func newEngine(screen tcell.Screen, game core.Game) *engine {
+	core.SetGlobalKeys(game, core.GlobalKeys{Pause: "Space", Reset: "R", Leave: "Esc", LeaveAction: "menu"})
 	return &engine{screen: screen, game: game, held: make(map[keyID]heldKey)}
 }
 
