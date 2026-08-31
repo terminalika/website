@@ -66,7 +66,7 @@ async function boot(args) {
 }
 
 let failed = false;
-for (const args of [[], ['--game=snake'], ['--game=tetris'], ['--game=invaders'], ['--game=pong']]) {
+for (const args of [[], ['--game=snake'], ['--game=tetris'], ['--game=invaders'], ['--game=dino']]) {
 	const label = args.join(' ') || '(menu)';
 	try {
 		const { result, stats } = await boot(args);

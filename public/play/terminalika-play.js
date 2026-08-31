@@ -15,7 +15,7 @@
 //
 // The renderer is not: upstream builds a fresh <span> per dirty cell and
 // re-appends every row on each show(), which at the launcher's 125 Hz frame
-// rate with a game that redraws ~200 cells per frame (Invaders, Pong) means
+// rate with a game that redraws ~200 cells per frame (Invaders, Dino) means
 // thousands of DOM nodes per second and a full reflow per frame — enough to
 // hang the tab. Here the grid is a fixed set of <span>s created once per
 // resize; drawCell mutates the one cell in place and show() only moves the
