@@ -60,7 +60,6 @@ the pause. To narrow it, set in the config:
 Only one terminalika window is open at a time, whichever agents it watches:
 a single agent finishing should pause a single screen. Opening a second
 window takes over - the first closes itself within a couple of seconds and
-the new one shows a short notice saying so. Between windows (and from login,
-if you said yes in setup) a background `terminalika daemon` keeps listening
-and sends the desktop notifications. Details:
-[windows and the background daemon](/events/#windows-and-the-background-daemon).
+the new one shows a short notice saying so. Nothing runs between windows:
+terminalika is a game launcher, not a notification service. Details:
+[one window at a time](/events/#one-window-at-a-time).

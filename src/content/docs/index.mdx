@@ -39,9 +39,9 @@ import { Steps } from '@astrojs/starlight/components';
 3. **The agent is one pane away.**
 
    The game is already paused - switch panes, answer, come back whenever.
-   The game and your score are where you left them. Not at the terminal? A desktop notification, and a
-   small background process that keeps listening after every window is
-   closed.
+   The game and your score are where you left them. No desktop popups, no
+   background process: terminalika is a game launcher, not a notification
+   service.
 
 </Steps>
 
@@ -88,8 +88,9 @@ hook - through `terminalika notify`. See [agents](/agents/).
 <details>
 <summary>Do I have to play a game?</summary>
 
-No. Say yes to "keep running in the background" and you have a notification
-service; open the window only when you feel like a round of Tetris.
+Then you don't need terminalika: it is a game launcher that pauses when
+your agent needs you, not a notification service. There is no background
+mode - it only does something while a window is open.
 
 </details>
 <details>
@@ -103,8 +104,8 @@ deduplicated.
 <details>
 <summary>Where do notifications show up?</summary>
 
-Always in the game. On the desktop, when you choose: only while the window
-isn't focused (default), always, only when no window is open, or never.
+In the game, and only there: the pause notice, a corner banner if you
+turned auto-pause off, a toast on the home screen. No desktop notifications.
 
 </details>
 <details>

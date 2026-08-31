@@ -18,13 +18,10 @@ Every agent's activity is normalised into two kinds of event:
 | `finished`       | The agent completed its run and is idle.                                     | `<Agent>'s done - you're up.` (or the agent's `message` from config)         |
 | `input_required` | The agent stopped to ask you something: a question, a permission prompt.     | `<Agent> has a question - don't leave it hanging.`                           |
 
-Each event can also become a **native desktop notification** (`notify-send`
-on Linux, `osascript` on macOS, a PowerShell toast on Windows) titled
-*Claude Code needs your input!* or *Pi Agent finished processing*. Setup
-asks *when*: only while the terminalika window isn't focused (the default),
-always, only while no window is open at all, or never - see
-[`notify.desktop`](/usage/config/#schema). The in-game notice itself is
-always on.
+That is the whole delivery: the notice in the game, or the banner, or the
+toast on the home screen. terminalika is a game launcher, not a
+notification service - it sends no desktop notifications and runs nothing
+when no window is open. The in-game notice itself is always on.
 
 An event is shown to you **once**: whichever screen shows it first (the
 game's pause notice, the corner banner, the home toast) retires it, so
@@ -156,7 +153,7 @@ aider --notifications --notifications-command "terminalika notify --agent aider"
 `webhook.addr` changes the base address (default `127.0.0.1:7788`; a taken
 port is skipped forward, like the [WebSocket sidecar](/websocket/)).
 
-## windows and the background daemon
+## one window at a time
 
 Only **one terminalika window** is open at a time, so there is exactly one
 place an event shows up. Opening a second window takes over: the first one
@@ -166,12 +163,7 @@ heartbeat so a crashed holder is reclaimed automatically) and republishes
 `hub.json`, so `terminalika notify` always reaches the window that is
 actually reacting.
 
-With **"keep terminalika running in the background"** on (the default), a
-headless `terminalika daemon` is registered to start at login - an XDG
-autostart entry on Linux, a launchd agent on macOS, the `HKCU\…\Run` key on
-Windows - and a window starts it if it isn't running. The daemon runs the
-same agent hub and sends desktop notifications; it holds the listener seat
-only while no window does, goes quiet the moment you open one and picks up
-again when you close it. Its own seat is `daemon.json` (delete it to stop
-the daemon; `daemon.log` next to it has its few log lines). Turning the
-setting off removes the login entry and stops the daemon.
+Nothing runs when no window is open. Earlier versions offered a
+background `terminalika daemon` with a login entry; a window removes that
+entry on start, and `terminalika daemon` itself now only removes it and
+exits.
