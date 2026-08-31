@@ -1,15 +1,14 @@
 ---
 /**
- * <Terminal> — an interactive shell that only knows `terminalika`, and runs
- * the real thing.
+ * <Terminal> — an interactive shell that only knows `terminalika`.
  *
  *  - type: inline ghost text suggests the completion; Tab / → accepts it,
  *    Tab with several candidates lists them (bash style);
  *  - Enter runs the line; ↑/↓ walk history; Ctrl+L clears; Ctrl+C cancels;
  *  - anything that isn't `terminalika` is rejected with "command not found";
- *  - `terminalika` / `terminalika --game=<name>` hands the screen to the
- *    WebAssembly build of the launcher (public/play/, built from wasm/ by
- *    `npm run build:wasm`); ESC on its menu returns to the shell.
+ *  - `terminalika` / `terminalika --game=<name>` parses like the real binary
+ *    and then points at /install: the launcher needs a real terminal, the
+ *    games are not run in the browser.
  *
  * Flag parsing and error strings mirror the Go binary (`main.go` + the Go
  * `flag` package), so what you see here is what the real one says.
@@ -23,7 +22,7 @@ interface Props {
 const { version = latestVersion } = Astro.props;
 ---
 
-<div class="tk-term not-content" data-version={version} data-mode="shell" tabindex="0" aria-label="Interactive terminal, only the terminalika command is available">
+<div class="tk-term not-content" data-version={version} tabindex="0" aria-label="Interactive terminal, only the terminalika command is available">
 	<div class="tk-term__bar">
 		<span class="tk-term__hint">try <kbd>terminalika</kbd> · Tab completes</span>
 	</div>
@@ -36,7 +35,6 @@ const { version = latestVersion } = Astro.props;
 			<span class="tk-term__ghost"></span>
 		</div>
 		<input class="tk-term__input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="command input" />
-		<pre class="tk-term__game" hidden tabindex="0" aria-label="terminalika"></pre>
 	</div>
 </div>
 
@@ -57,47 +55,16 @@ const { version = latestVersion } = Astro.props;
 
 	const COMPLETIONS = ['--game=dino', '--game=invaders', '--game=snake', '--game=tetris', '--claude', '--pi', '--ws=', '--version', '-h'];
 
-	const PLAY_SCRIPTS = ['/play/wasm_exec.js', '/play/terminalika-play.js'];
-
-	declare global {
-		interface Window {
-			terminalikaPlay?: (el: HTMLElement, args: string[]) => Promise<void>;
-		}
-	}
-
-	let scriptsLoaded: Promise<void> | null = null;
-	function loadPlayScripts(): Promise<void> {
-		if (!scriptsLoaded) {
-			scriptsLoaded = (async () => {
-				for (const src of PLAY_SCRIPTS) {
-					await new Promise<void>((resolve, reject) => {
-						const s = document.createElement('script');
-						s.src = src;
-						s.onload = () => resolve();
-						s.onerror = () => reject(new Error(`could not load ${src}`));
-						document.head.append(s);
-					});
-				}
-			})().catch((err) => {
-				scriptsLoaded = null;
-				throw err;
-			});
-		}
-		return scriptsLoaded;
-	}
-
 	class Term {
 		root: HTMLElement;
 		out: HTMLElement;
 		typed: HTMLElement;
 		ghost: HTMLElement;
 		input: HTMLInputElement;
-		game: HTMLElement;
 		version: string;
 		history: string[] = [];
 		histIdx = -1;
 		draft = '';
-		playing = false;
 
 		constructor(root: HTMLElement) {
 			this.root = root;
@@ -105,7 +72,6 @@ const { version = latestVersion } = Astro.props;
 			this.typed = root.querySelector('.tk-term__typed')!;
 			this.ghost = root.querySelector('.tk-term__ghost')!;
 			this.input = root.querySelector('.tk-term__input')!;
-			this.game = root.querySelector('.tk-term__game')!;
 			this.version = root.dataset.version ?? 'dev';
 
 			root.addEventListener('click', () => this.focus());
@@ -114,11 +80,9 @@ const { version = latestVersion } = Astro.props;
 			this.input.addEventListener('keydown', (e) => this.key(e));
 			this.input.addEventListener('focus', () => root.classList.add('is-focused'));
 			this.input.addEventListener('blur', () => root.classList.remove('is-focused'));
-			this.game.addEventListener('focus', () => root.classList.add('is-focused'));
-			this.game.addEventListener('blur', () => root.classList.remove('is-focused'));
 
 			this.print('muted', `terminalika ${this.version} · a shell that only knows one command`);
-			this.print('muted', 'type terminalika, press Tab to complete, Enter to run. the games are real.');
+			this.print('muted', 'type terminalika, press Tab to complete, Enter to run.');
 			this.render();
 
 			// Deep link: /?play (menu) or /?play=snake runs the command on load.
@@ -127,8 +91,7 @@ const { version = latestVersion } = Astro.props;
 		}
 
 		focus() {
-			if (this.playing) this.game.focus({ preventScroll: true });
-			else this.input.focus({ preventScroll: true });
+			this.input.focus({ preventScroll: true });
 		}
 
 		/* ---- rendering ------------------------------------------------- */
@@ -313,10 +276,10 @@ const { version = latestVersion } = Astro.props;
 				return;
 			}
 
-			const ignored = ['claude', 'pi', 'ws'].filter((f) => f in opts);
-			if (ignored.length) this.print('muted', `(${ignored.map((f) => '--' + f).join(', ')} accepted but inert in the browser: no agent sessions, no sidecar)`);
-
-			await this.play(game ? [`--game=${game}`] : []);
+			// The real thing needs a terminal: agent sessions, key releases and
+			// a place to sit next to your agent. This shell stops here.
+			this.print('output', game ? `${game} would open here - in a real terminal.` : 'the home screen would open here - in a real terminal.');
+			this.print('muted', 'install terminalika and run the same line there:  terminalika.dev/install');
 		}
 
 		usage() {
@@ -327,30 +290,6 @@ const { version = latestVersion } = Astro.props;
 			}
 		}
 
-		/* ---- running the real thing ------------------------------------ */
-
-		async play(args: string[]) {
-			if (this.playing) return;
-			this.playing = true;
-			this.print('muted', `loading terminalika…`);
-			try {
-				await loadPlayScripts();
-				if (!window.terminalikaPlay) throw new Error('player did not initialise');
-				this.root.dataset.mode = 'play';
-				this.game.hidden = false;
-				await window.terminalikaPlay(this.game, args);
-				this.print('muted', 'terminalika exited');
-			} catch (err) {
-				this.print('error', `terminalika: ${err instanceof Error ? err.message : String(err)}`);
-			} finally {
-				this.root.dataset.mode = 'shell';
-				this.game.hidden = true;
-				this.game.replaceChildren();
-				this.playing = false;
-				this.render();
-				this.focus();
-			}
-		}
 	}
 
 	function commonPrefix(list: string[]): string {
