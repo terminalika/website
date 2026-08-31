@@ -379,6 +379,76 @@ body::before {
 	background: var(--tk-bg-panel);
 }
 
+/* Home-page demo carousel: the CLI capture, then the pi extension's.
+   Arrows fade in on hover (and stay on touch screens, where there is no
+   hover); only one video is in the DOM flow at a time. */
+.tk-carousel {
+	position: relative;
+	margin: 1.5rem 0;
+	outline: none;
+}
+.tk-carousel .tk-demo {
+	margin: 0;
+}
+.tk-carousel-arrow {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 2.75rem;
+	height: 2.75rem;
+	border: 1px solid var(--tk-border);
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--tk-bg-panel) 85%, transparent);
+	color: var(--tk-accent, var(--sl-color-accent));
+	font: inherit;
+	font-size: 1.9rem;
+	line-height: 1;
+	cursor: pointer;
+	opacity: 0;
+	transition: opacity 0.18s ease, background 0.18s ease;
+}
+.tk-carousel-prev {
+	left: 0.75rem;
+}
+.tk-carousel-next {
+	right: 0.75rem;
+}
+.tk-carousel:hover .tk-carousel-arrow:not([hidden]),
+.tk-carousel:focus-visible .tk-carousel-arrow:not([hidden]),
+.tk-carousel-arrow:focus-visible {
+	opacity: 1;
+}
+.tk-carousel-arrow:hover {
+	background: var(--tk-bg-panel);
+}
+@media (hover: none) {
+	.tk-carousel-arrow:not([hidden]) {
+		opacity: 0.85;
+	}
+}
+.tk-carousel-caption {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1rem;
+	margin-top: 0.5rem;
+	font-size: 0.85rem;
+	color: var(--sl-color-gray-3);
+}
+.tk-carousel-dots {
+	display: inline-flex;
+	gap: 0.4rem;
+}
+.tk-carousel-dot {
+	width: 0.5rem;
+	height: 0.5rem;
+	border-radius: 999px;
+	background: var(--tk-border);
+}
+.tk-carousel-dot.on {
+	background: var(--tk-accent, var(--sl-color-accent));
+}
+
 /* Founder note on the home page: a quote in the author's own voice.
    Italic body, accent left bar, dimmed signature; optional small round
    avatar next to the name. */
