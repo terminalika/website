@@ -1,10 +1,39 @@
 ---
 title: install
-description: Download and install terminalika on Linux, macOS and Windows.
+description: The CLI for any agent, or the pi extension - and which one fits your agent.
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import VerifyShell from '../../components/VerifyShell.astro';
+
+terminalika comes in two forms. The **CLI** is a standalone launcher that
+runs in the pane next to any agent and watches the agent's own transcript
+(or takes a hook). The **extension** puts the same games *inside*
+[pi](https://pi.dev), as an overlay - no second pane, no CLI needed.
+
+| Method                                                          | CLI | Extension (pi) |
+| --------------------------------------------------------------- | :-: | :------------: |
+| [Homebrew](#package-managers) (macOS / Linux)                   |  ✓  |       -        |
+| [Scoop](#package-managers) (Windows)                            |  ✓  |       -        |
+| [`.deb` / `.rpm` / `.pkg.tar.zst` / `.apk`](#linux-packages)     |  ✓  |       -        |
+| [Raw binary](#raw-binaries) (`tar.gz` / `zip`)                  |  ✓  |       -        |
+| [`go install`](#package-managers) (Go 1.24+)                    |  ✓  |       -        |
+| [`pi install`](#extension-pi)                                   |  -  |       ✓        |
+
+## which one for your agent
+
+Three stages: does the CLI detect the agent with nothing installed on the
+agent side; what does the agent itself have to be told for the CLI; can the
+games run inside the agent.
+
+| Agent       | 1 · CLI, out of the box                                       | 2 · CLI, agent-side config                                                    | 3 · Extension inside the agent |
+| ----------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------ |
+| Claude Code | ✓ tails `~/.claude/projects`: end of turn, `AskUserQuestion`  | optional: [`Notification`/`Stop` hooks](/events/#claude-code-hooks) add permission prompts | - (Claude Code has no UI API)  |
+| Pi Agent    | ✓ tails `~/.pi/agent/sessions`                                | none                                                                          | ✓ [pi-terminalika](#extension-pi) (`/play`) |
+| Aider       | ✓ tails `.aider.chat.history.md` (best effort)                 | recommended: [`--notifications-command`](/events/#aider)                       | -                              |
+| Cursor CLI  | - (no session files)                                           | required: [`stop` hook](/events/#cursor-cli-hooks) → `terminalika notify`      | -                              |
+
+## cli
 
 Every release ships prebuilt packages and raw binaries on the
 [GitHub releases page](https://github.com/terminalika/terminalika/releases).
@@ -13,7 +42,7 @@ Pick whichever fits your system; there is nothing else to configure.
 Supported platforms: **Linux**, **macOS** and **Windows**, each in `amd64` and `arm64`.
 On Windows you need Windows 10+ and a VT-capable terminal (Windows Terminal).
 
-## package managers
+### package managers
 
 <Tabs syncKey="os">
 	<TabItem label="macOS / Linux (Homebrew)">
@@ -36,7 +65,7 @@ On Windows you need Windows 10+ and a VT-capable terminal (Windows Terminal).
 	</TabItem>
 </Tabs>
 
-## linux packages
+### linux packages
 
 Direct downloads; no third-party repository or AUR needed. These links always
 resolve to the latest release.
@@ -73,7 +102,7 @@ names use the plain `amd64`/`arm64` pair for every format, not each distro's
 native `x86_64`/`aarch64` spelling. Purely cosmetic: package managers read
 the real architecture from the package metadata, not the file name.
 
-## raw binaries
+### raw binaries
 
 If you would rather not use a package: each release also attaches a `tar.gz`
 (Linux, macOS) or `zip` (Windows) containing a single static `terminalika`
@@ -85,7 +114,7 @@ tar xzf terminalika_linux_amd64.tar.gz
 install -m 755 terminalika ~/.local/bin/
 ```
 
-## verify
+### verify
 
 <VerifyShell />
 
@@ -94,11 +123,31 @@ That is your terminal (or multiplexer), not the game. Terminalika needs a
 terminal that reports key releases; see [terminals/key-releases](/terminals/).
 :::
 
+## extension (pi)
+
+```sh
+pi install git:github.com/terminalika/pi-terminalika
+```
+
+Then, while pi works:
+
+```
+/play            pick a game
+/play snake      or name one: snake, tetris, invaders, pong
+/play stop       end the game
+```
+
+The games ship as wasm inside the package and pause on pi's own
+`agent_settled` event - nothing to configure, no CLI required. `ESC` (or
+`alt+g`) parks the game and hands the keyboard back to pi; `alt+g` or
+`/play` brings it back exactly where it was; `/play stop` is the only way
+out. Needs pi 0.84+. Source and details:
+[pi-terminalika](https://github.com/terminalika/pi-terminalika).
+
 ## updating
 
-terminalika does not update itself, and there is no repository to subscribe
-to. Every install command on this page resolves to the latest release, so
-updating is re-running the one you used:
+Neither form updates itself. Every install command on this page resolves to
+the latest release, so updating is re-running the one you used:
 
 | Installed with                     | Update with                                              |
 | ---------------------------------- | -------------------------------------------------------- |
@@ -107,6 +156,7 @@ updating is re-running the one you used:
 | Go                                 | `go install github.com/terminalika/terminalika@latest`   |
 | a distro package (deb/rpm/zst/apk) | the same two lines from [linux packages](#linux-packages) |
 | a raw binary                       | the same three lines from [raw binaries](#raw-binaries)  |
+| `pi install`                       | `pi update`                                              |
 
 `terminalika -version` prints what you are running; the
 [releases page](https://github.com/terminalika/terminalika/releases/latest)

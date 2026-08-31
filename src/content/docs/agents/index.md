@@ -9,18 +9,20 @@ for your answer. So the launcher can subscribe to an agent's session and
 pause the game the instant the agent settles.
 
 Supported agents (pick any combination in the setup wizard, or with
-`--agents`):
+`--agents`), in three stages: does the CLI detect the agent with nothing
+installed on the agent side; what does the agent itself have to be told for
+the CLI; can the games run inside the agent.
 
-| Agent                                  | id       | Detection                          | Page                          |
-| -------------------------------------- | -------- | ---------------------------------- | ----------------------------- |
-| Claude Code                            | `claude` | session transcripts (+ hooks)      | [agents/claude](/agents/claude/) |
-| Pi Agent                               | `pi`     | session files                      | [agents/pi](/agents/pi/)      |
-| Aider                                  | `aider`  | chat history (+ notifications command) | [events](/events/#aider)  |
-| Cursor CLI                             | `cursor` | `stop` hook → `terminalika notify` | [events](/events/#cursor-cli-hooks) |
+| Agent       | id       | 1 · CLI, out of the box                                       | 2 · CLI, agent-side config                                                    | 3 · Extension inside the agent |
+| ----------- | -------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------ |
+| Claude Code | `claude` | ✓ [session transcripts](/agents/claude/): end of turn, `AskUserQuestion` | optional: [hooks](/events/#claude-code-hooks) add permission prompts     | - (Claude Code has no UI API)  |
+| Pi Agent    | `pi`     | ✓ [session files](/agents/pi/)                                | none                                                                          | ✓ [pi-terminalika](/install/#extension-pi) (`/play`) |
+| Aider       | `aider`  | ✓ chat history (best effort)                                   | recommended: [`--notifications-command`](/events/#aider)                       | -                              |
+| Cursor CLI  | `cursor` | - (no session files)                                           | required: [`stop` hook](/events/#cursor-cli-hooks) → `terminalika notify`      | -                              |
 
 All selected agents are monitored at the same time. The full event model -
-the two event kinds, notification channels, auto-pause, and the webhook any
-tool can post to - is on the [events](/events/) page.
+the two event kinds, auto-pause, and the webhook any tool can post to - is
+on the [events](/events/) page.
 
 ## how it works
 
