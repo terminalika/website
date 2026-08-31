@@ -19,7 +19,8 @@
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@fontsource-variable/pixelify-sans": "^5.3.0",
     "astro": "^7.1.6",
-    "sharp": "^0.35.3"
+    "sharp": "^0.35.3",
+    "swiper": "^14.2.0"
   },
   "allowScripts": {
     "esbuild": true,
