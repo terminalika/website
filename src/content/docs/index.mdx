@@ -44,7 +44,7 @@ import DemoCarousel from '../../components/DemoCarousel.astro';
 
    The game is already paused - switch panes, answer, come back whenever.
    The game and your score are where you left them. In pi, not even that:
-   `ESC` parks the game, you answer in the same window, `alt+g` brings it
+   `ESC` parks the game, you answer in the same window, `/play` brings it
    back exactly where it was. No desktop popups, no background process:
    terminalika is a game launcher, not a notification service.
 
@@ -115,14 +115,14 @@ deduplicated. The [pi extension](/pi/) is even narrower: pi's own
 In the game, and only there: the pause notice, a corner banner if you
 turned auto-pause off, a toast on the home screen. In the
 [pi extension](/pi/), the same pause notice - or a toast pointing at
-`alt+g` if you chose the settle mode. No desktop notifications either way.
+`/play` if you chose the settle mode. No desktop notifications either way.
 
 </details>
 <details>
 <summary>Can I answer the agent from inside the game?</summary>
 
 With the [pi plugin](/pi/), yes: the game is an overlay inside pi itself,
-so `ESC` parks it, you answer right there, and `alt+g` brings it back where
+so `ESC` parks it, you answer right there, and `/play` brings it back where
 it was. With the CLI the agent is one pane away - switch, answer, come back.
 
 </details>

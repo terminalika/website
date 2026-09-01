@@ -36,7 +36,7 @@ Updating is `pi update`.
 		{ type: 'input', text: '/play tetris' },
 		{ type: 'comment', text: '# the game opens as an overlay; pi keeps working under it' },
 		{ type: 'ok', text: "Pi Agent's done - you're up.", delay: 1400 },
-		{ type: 'comment', text: '# SPACE resumes · ESC parks · /play stop ends it' },
+		{ type: 'comment', text: '# SPACE resumes · ESC parks · alt+g picks · /play stop ends it' },
 	]}
 />
 
@@ -45,13 +45,13 @@ Updating is `pi update`.
 | `/play`            | Pick a game from a list.                                                |
 | `/play snake`      | Or name one: `snake`, `tetris`, `2048`, `mines`.                        |
 | `/play tetris` (while another is on) | **Swap** games. It closes the one that is on, so it asks `Yes / No / Yes, and don't ask again` first. |
-| `alt+s`            | The picker, from either side: in the game it parks first; cancelling brings the same game back. |
-| `ESC` or `alt+g`   | **Park** the game: it pauses, hides, and the keyboard goes back to pi.  |
-| `alt+g` or `/play` | Bring it back exactly where it was (unparking keeps it paused; `SPACE` resumes). |
+| `alt+g`            | The picker, from either side, the game that is on listed first: in the game it parks first; cancelling brings the same game back. |
+| `ESC`              | **Park** the game: it pauses, hides, and the keyboard goes back to pi.  |
+| `/play`            | Bring it back exactly where it was (unparking keeps it paused; `SPACE` resumes). |
 | `/play stop`       | End the game - the only way out.                                        |
 
-On a Mac the same keys read `option+g` and `option+s` everywhere the
-extension names them; the bindings do not change.
+On a Mac `alt+g` reads `option+g` everywhere the extension names it; the
+binding does not change.
 
 `ESC` never quits here, unlike the CLI: answering pi mid-game *is* the
 point, so `ESC` only hands the keyboard back. While a game is parked, pi's
@@ -71,7 +71,7 @@ once on your first `/play`:
 | Mode                | What happens                                                                |
 | ------------------- | --------------------------------------------------------------------------- |
 | `pause` *(default)* | The game freezes with a one-line notice in pi's colour; `SPACE` resumes.    |
-| `settle`            | The game parks itself - keyboard back to pi, a toast points at `alt+g`.     |
+| `settle`            | The game parks itself - keyboard back to pi, a toast points at `/play`.     |
 | `no_pause`          | Nothing; keep playing.                                                      |
 
 Skipping the question with `ESC` keeps the default for that run and asks

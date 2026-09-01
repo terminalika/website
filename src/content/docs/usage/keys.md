@@ -17,7 +17,8 @@ Everything else (arrows, `WASD`, per-game keys) is forwarded to the running
 game.
 
 In the [pi extension](/pi/) `R` and `SPACE` are the same, but `ESC`
-**parks** the game (pi gets the keyboard back; `alt+g` returns) instead of
+**parks** the game (pi gets the keyboard back; `/play` returns, `alt+g`
+picks another game) instead of
 leaving it - there is no home screen or wizard there, and `/play stop` is
 the only exit. The two sections below are CLI screens.
 

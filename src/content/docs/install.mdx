@@ -140,10 +140,10 @@ Then, while pi works:
 ```
 
 The games ship as wasm inside the package and pause on pi's own
-`agent_settled` event - nothing to configure, no CLI required. `ESC` (or
-`alt+g`) parks the game and hands the keyboard back to pi; `alt+g` or
-`/play` brings it back exactly where it was; `/play stop` is the only way
-out. Needs pi 0.84+, on Node 22+ or Bun. The whole story - auto-pause
+`agent_settled` event - nothing to configure, no CLI required. `ESC` parks
+the game and hands the keyboard back to pi; `/play` brings it back exactly
+where it was; `alt+g` picks another game from either side; `/play stop` is
+the only way out. Needs pi 0.84+, on Node 22+ or Bun. The whole story - auto-pause
 modes, `pi.json`, held keys, what the extension leaves to the CLI - is on
 [pi extension](/pi/).
 
