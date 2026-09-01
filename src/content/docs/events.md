@@ -9,6 +9,12 @@ input**, and pauses whatever you're playing so you never miss the moment.
 
 Run `terminalika --setup` at any time to change what's selected here.
 
+:::note
+This whole page is the CLI's event hub. The [pi extension](/pi/) needs none
+of it: it hooks pi's own `agent_settled` event directly - no setup, no
+tailing, no webhook, no `terminalika` binary on `PATH`.
+:::
+
 ## event kinds
 
 Every agent's activity is normalised into two kinds of event:
@@ -39,7 +45,7 @@ either way.
 | Agent       | id       | Native detection                                                                        | Also via webhook |
 | ----------- | -------- | --------------------------------------------------------------------------------------- | ---------------- |
 | Claude Code | `claude` | Tails `~/.claude/projects/**/*.jsonl`: end of turn → `finished`; `AskUserQuestion` → `input_required`. | yes: hooks give you *permission prompts* too |
-| Pi Agent    | `pi`     | Tails `~/.pi/agent/sessions/**/*.jsonl`: terminal stop reason → `finished`.             | yes              |
+| Pi Agent    | `pi`     | Tails `~/.pi/agent/sessions/**/*.jsonl`: terminal stop reason → `finished`. Or skip all this and play [inside pi](/pi/). | yes              |
 | Aider       | `aider`  | Tails `.aider.chat.history.md` in the working directory: a new assistant reply → `finished` (best effort). | recommended: `--notifications-command` |
 | Cursor CLI  | `cursor` | none                                                                                    | required: `stop` hook |
 

@@ -9,6 +9,13 @@ answers here. `terminalika --setup` asks again; `terminalika --reset` (or
 `-r`) deletes the file and starts over; editing the file by hand works too.
 A missing file simply triggers setup on the next run.
 
+:::note
+`config.json` and everything on this page belong to the CLI. The
+[pi extension](/pi/) keeps its one setting in a separate
+[`pi.json`](/pi/#pijson) in the same directory - and its `auto_pause` is a
+three-valued string, not this file's bool.
+:::
+
 ## location
 
 | OS      | Path                                                    |
@@ -27,6 +34,8 @@ the launcher's runtime files:
 | `ws.json`       | Resolved [sidecar](/websocket/) address of the running game (`{"game","addr","url"}`). |
 | `listener.json` | Which window holds the [agent listener seat](/events/#one-window-at-a-time).      |
 | `instance.lock` | Advisory lock used while a game is running.                                      |
+
+All of these are the CLI's; the extension writes only `pi.json` there.
 
 A **malformed** file is reported on stderr and ignored (the launcher
 continues with defaults).

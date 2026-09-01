@@ -16,7 +16,7 @@ the CLI; can the games run inside the agent.
 | Agent       | id       | 1 · CLI, out of the box                                       | 2 · CLI, agent-side config                                                    | 3 · Extension inside the agent |
 | ----------- | -------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------ |
 | Claude Code | `claude` | ✓ [session transcripts](/agents/claude/): end of turn, `AskUserQuestion` | optional: [hooks](/events/#claude-code-hooks) add permission prompts     | - (Claude Code has no UI API)  |
-| Pi Agent    | `pi`     | ✓ [session files](/agents/pi/)                                | none                                                                          | ✓ [pi-terminalika](/install/#extension-pi) (`/play`) |
+| Pi Agent    | `pi`     | ✓ [session files](/agents/pi/)                                | none                                                                          | ✓ [pi-terminalika](/pi/) (`/play`) |
 | Aider       | `aider`  | ✓ chat history (best effort)                                   | recommended: [`--notifications-command`](/events/#aider)                       | -                              |
 | Cursor CLI  | `cursor` | - (no session files)                                           | required: [`stop` hook](/events/#cursor-cli-hooks) → `terminalika notify`      | -                              |
 
@@ -26,7 +26,10 @@ on the [events](/events/) page.
 
 ## how it works
 
-No bridge process, no server mode, no plugin on the agent side. Each agent
+No bridge process, no server mode, no plugin on the agent side - pi being
+the one exception where a plugin exists, the [pi plugin](/pi/), and it is
+the better fit there (it skips the tailing below entirely and listens to
+pi's own `agent_settled` event). Each agent
 writes its conversation to a session file on disk as it goes; terminalika
 **tails** that file and looks for one specific thing: a new assistant
 message whose stop reason means *"I'm done, your turn"*. Messages that are
@@ -64,4 +67,5 @@ a single agent finishing should pause a single screen. Opening a second
 window takes over - the first closes itself within a couple of seconds and
 the new one shows a short notice saying so. Nothing runs between windows:
 terminalika is a game launcher, not a notification service. Details:
-[one window at a time](/events/#one-window-at-a-time).
+[one window at a time](/events/#one-window-at-a-time). (A CLI concept: the
+[pi extension](/pi/) lives inside one pi and holds no seat.)

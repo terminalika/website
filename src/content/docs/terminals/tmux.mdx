@@ -39,12 +39,17 @@ sticky.
 
 - **Run terminalika outside tmux.** Open a plain terminal tab or window; the
   launcher is a standalone binary and needs nothing from the tmux session.
-- Or keep tmux and accept the sticky feel; Snake and Tetris are barely
-  affected, Pong and Invaders are.
+  With the [pi extension](/pi/) it is pi itself that has to run outside
+  tmux - the game shares pi's pane.
+- Or keep tmux: none of the built-in games reads held-key state at the
+  moment, so they all play the same inside it; only a game that implements
+  `KeyStateHandler` would feel sticky.
 
 ## check for yourself
 
 ```sh
 echo $TMUX              # non-empty inside tmux → fallback is used
-terminalika --game=pong # warning screen names tmux
 ```
+
+A held-key game started here would show the warning screen naming tmux; the
+built-in games don't read held keys, so they start without one.

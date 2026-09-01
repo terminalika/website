@@ -16,6 +16,11 @@ These are intercepted by the launcher before any game sees them:
 Everything else (arrows, `WASD`, per-game keys) is forwarded to the running
 game.
 
+In the [pi extension](/pi/) `R` and `SPACE` are the same, but `ESC`
+**parks** the game (pi gets the keyboard back; `alt+g` returns) instead of
+leaving it - there is no home screen or wizard there, and `/play stop` is
+the only exit. The two sections below are CLI screens.
+
 ## home screen
 
 The landing screen shows only the animated hero and a one-line prompt; the
@@ -46,8 +51,10 @@ Per-game controls are listed in [usage/games](/usage/games/).
 
 ## held keys
 
-Movement in Pong (paddles) and Invaders (cannon) is *continuous*: the game
-wants to know when a key is held down and when it is let go. Most terminals
+A game with *continuous* movement (a paddle that glides while the key is
+down) wants to know when a key is held and when it is let go. None of the
+built-in games does that at the moment - they all move one step per
+keypress - but the launcher supports it for games that do. Most terminals
 only report presses, so the launcher probes the terminal at start and either:
 
 - receives real press / repeat / release events (kitty keyboard protocol,
@@ -56,3 +63,5 @@ only report presses, so the launcher probes the terminal at start and either:
   works but feels sticky.
 
 Which one you get, and why, is explained in [terminals/key-releases](/terminals/).
+The [pi extension](/pi/#held-keys) does the same dance, with pi relaying
+the events.

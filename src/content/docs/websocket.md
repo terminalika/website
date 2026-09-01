@@ -5,7 +5,8 @@ description: The optional WebSocket sidecar that exposes the running game's even
 
 While a game runs, terminalika can open a small WebSocket server next to it.
 The terminal stays in charge; the sidecar is a bonus observer/controller for
-external programs (bots, overlays, agent integrations).
+external programs (bots, overlays, agent integrations). CLI only: the
+[pi extension](/pi/) runs its games as wasm inside pi and opens no sidecar.
 
 ## address
 

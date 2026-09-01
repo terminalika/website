@@ -36,9 +36,12 @@ playable, only sticky.
 ## what to do
 
 - **Run terminalika outside zellij.** Open a plain terminal tab or window
-  instead of a zellij pane; that's all it takes.
-- Or keep zellij and accept the sticky feel; Snake and Tetris are barely
-  affected, Pong and Invaders are.
+  instead of a zellij pane; that's all it takes. With the
+  [pi extension](/pi/) it is pi itself that has to run outside zellij - the
+  game shares pi's pane.
+- Or keep zellij: none of the built-in games reads held-key state at the
+  moment, so they all play the same inside it; only a game that implements
+  `KeyStateHandler` would feel sticky.
 
 There is no zellij setting that changes this today; the events are dropped
 inside zellij's own input handling. If a future zellij release starts
@@ -48,5 +51,7 @@ relaying release events, the special case in the launcher will be lifted.
 
 ```sh
 echo $ZELLIJ            # non-empty inside zellij → fallback is used
-terminalika --game=pong # warning screen names zellij
 ```
+
+A held-key game started here would show the warning screen naming zellij;
+the built-in games don't read held keys, so they start without one.

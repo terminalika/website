@@ -13,7 +13,7 @@ terminal's own **auto-repeat**: one event, a pause, then a burst of events,
 and nothing at all when you let go.
 
 For a text editor that is fine. For a game element that should move *while*
-the key is held and stop *when* it is released - pong's paddles, say - it is
+the key is held and stop *when* it is released - a paddle, say - it is
 not: the game cannot tell "still held" from "released", so movement either
 stutters or overshoots. That is what "sticky" means in the warning screen.
 
@@ -33,8 +33,8 @@ terminal I/O is wrapped: release sequences are pulled out of the input stream
 before the UI library (which does not understand them) sees them, repeats are
 rewritten into plain presses, and each release is re-injected in order as a
 marked press so it travels through the normal event queue. Games that
-implement `KeyStateHandler` (Pong, Invaders) then get true press/release
-pairs.
+implement `KeyStateHandler` then get true press/release pairs. (None of the
+built-in games does at the moment: they all move one step per keypress.)
 
 <Shell
 	title="probe"
@@ -45,6 +45,11 @@ pairs.
 		{ type: 'warn', text: '^[[?62;22c                  # DA1 only               → auto-repeat fallback' },
 	]}
 />
+
+In the [pi extension](/pi/) the same story plays out one layer up: pi owns
+the terminal and relays kitty-protocol key releases to the game; when the
+terminal doesn't speak the protocol, the extension synthesises releases the
+same way the launcher's fallback below does.
 
 ## the fallback: synthesised releases
 
@@ -74,15 +79,17 @@ moving.
 | **tmux**                                      | **no**       | does not implement the protocol at all: [tmux](/terminals/tmux/) |
 
 If your terminal is in the "yes" rows but you still get the warning, you are
-probably inside a multiplexer; see the two pages above.
+probably inside a multiplexer; see the two pages above. The table applies
+unchanged to the [pi extension](/pi/) - read it for the terminal (and
+multiplexer) pi runs in.
 
 ## the warning screen
 
 Not every game cares about held keys: most move one step per keypress and
 never read "still held" state, so they are unaffected no matter the
-terminal. Only a game that reads held-key state (currently pong, for its
-paddles) is affected, and only that game shows the notice - right when it
-starts, not at launcher startup.
+terminal. Only a game that reads held-key state is affected, and only that
+game shows the notice - right when it starts, not at launcher startup. With
+the current built-in games, none does, so the notice never appears.
 
 When releases are unavailable and the game you picked is affected, a short
 notice names the reason (your terminal, zellij, or tmux), the control that

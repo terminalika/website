@@ -11,6 +11,7 @@ Terminalika is split across the `terminalika` GitHub organisation:
 | ----------------------------------------------------------------- | ----------------------------------------------------------- |
 | [`terminalika/terminalika-core`](https://github.com/terminalika/terminalika-core) | Library: the `Game` contract, registry, event bus, built-in games, high scores. Headless; renders into whatever `tcell.Screen` it is given. |
 | [`terminalika/terminalika`](https://github.com/terminalika/terminalika)           | The CLI launcher: menu, engine, key-release handling, agent watchers, WebSocket sidecar, packaging. |
+| [`terminalika/pi-terminalika`](https://github.com/terminalika/pi-terminalika)     | The [pi extension](/pi/): the games compiled to wasm, run on a worker thread inside pi, driven by a trimmed TypeScript port of the launcher's engine. |
 | [`terminalika/homebrew-tap`](https://github.com/terminalika/homebrew-tap)         | Homebrew cask, pushed by the release pipeline.              |
 | [`terminalika/scoop-bucket`](https://github.com/terminalika/scoop-bucket)         | Scoop manifest, pushed by the release pipeline.             |
 | [`terminalika/website`](https://github.com/terminalika/website)                   | This site.                                                  |
@@ -42,6 +43,13 @@ cd terminalika-core && go test ./...
 cd terminalika      && go test ./...
 ```
 
+The pi extension follows the same sibling-checkout pattern with its own
+scripts: `npm run build:wasm` recompiles `wasm/terminalika.wasm` from the
+local core (the built wasm is committed, so users never need Go), and
+`npm run test:wasm` boots it headlessly. It releases to npm as
+[`pi-terminalika`](https://www.npmjs.com/package/pi-terminalika), which
+`pi install npm:pi-terminalika` resolves.
+
 ## the game contract
 
 Every game implements `core.Game`:
@@ -60,8 +68,8 @@ type Game interface {
 
 Optional extras:
 
-- `core.KeyStateHandler`: receive key **release** notifications (used by
-  Pong and Invaders for held keys; see [terminals](/terminals/)).
+- `core.KeyStateHandler`: receive key **release** notifications for held
+  keys (no built-in game uses it at the moment; see [terminals](/terminals/)).
 - `core.Commandable`: accept external commands from the
   [WebSocket sidecar](/websocket/). Every command is acknowledged by a domain
   event correlated by id.

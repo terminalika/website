@@ -3,9 +3,15 @@ title: pi
 description: Pause the game when pi finishes a turn.
 ---
 
-Terminalika tails pi's session files and pauses the game when the agent stops
-and waits for you. pi appends entries live, so no bridge process and no pi
-server mode is needed. Works on Linux, macOS and Windows.
+pi is the one agent terminalika can live *inside*: the
+[pi extension](/pi/) runs the games as an overlay over the conversation
+(`/play`), paused by pi's own `agent_settled` event, and you answer pi
+without leaving the window. No CLI needed for that.
+
+The rest of this page is the CLI route: terminalika in the next pane, tailing
+pi's session files and pausing the game when the agent stops and waits for
+you. pi appends entries live, so no bridge process and no pi server mode is
+needed. Works on Linux, macOS and Windows.
 
 ## enable
 
@@ -20,7 +26,9 @@ EOF
 terminalika --game=snake
 ```
 
-The flag and the config field are OR-ed; either is enough.
+The flag and the config field are OR-ed; either is enough. (This
+`config.json` is the CLI's - not the extension's [`pi.json`](/pi/#pijson),
+which happens to live in the same directory.)
 
 ## config
 

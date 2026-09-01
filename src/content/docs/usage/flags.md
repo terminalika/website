@@ -7,11 +7,16 @@ description: Every command line flag and subcommand terminalika accepts.
 and `--flag value` all work. Run `terminalika -h` to see the same list from the
 binary.
 
+:::note
+This page is the CLI. The [pi extension](/pi/) has no flags and no
+subcommands - its whole surface is `/play`.
+:::
+
 ## reference
 
 | Flag        | Type     | Default          | What it does                                                                                                        |
 | ----------- | -------- | ---------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `--game`    | string   | *(home screen)*  | Skip the home screen and launch a game directly: `snake`, `tetris`, `invaders` or `pong`. An unknown name exits with an error before the terminal is touched. |
+| `--game`    | string   | *(home screen)*  | Skip the home screen and launch a game directly: `snake`, `tetris`, `2048` or `mines`. An unknown name exits with an error before the terminal is touched. |
 | `--agents`  | list     | *(config)*       | Comma-separated agent ids to listen to for this run (`claude,pi,aider,cursor`), replacing the config's list.       |
 | `--claude`  | bool     | `false`          | Also listen to [Claude Code](/agents/claude/) (added on top of the config / `--agents`).                            |
 | `--pi`      | bool     | `false`          | Also listen to [pi](/agents/pi/).                                                                                    |
@@ -27,7 +32,7 @@ binary.
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `terminalika setup`                      | Run the setup wizard again.                                                                        |
 | `terminalika reset`                      | Delete `config.json` and start over with the setup wizard.                                         |
-| `terminalika notify --agent <id> [--kind finished\|input_required] [--detail text]` | Deliver an agent event to the running terminalika through its [webhook](/events/#webhooks-terminalika-notify). Reads hook JSON from stdin when piped. Never fails the caller unless `--quiet=false`. |
+| `terminalika notify` `--agent <id>` `[--kind finished\|input_required]` `[--detail text]` | Deliver an agent event to the running terminalika through its [webhook](/events/#webhooks-terminalika-notify). Reads hook JSON from stdin when piped. Never fails the caller unless `--quiet=false`. |
 
 ## examples
 
@@ -36,7 +41,7 @@ binary.
 terminalika
 
 # straight into a game
-terminalika --game=pong
+terminalika --game=2048
 
 # game + Claude Code only, no sidecar
 terminalika --game=tetris --agents=claude --ws=""
@@ -64,7 +69,7 @@ launcher keeps going.
 
 | Variable                      | Used by  | Effect                                              |
 | ----------------------------- | -------- | --------------------------------------------------- |
-| `TERMINALIKA_CONFIG_DIR`      | everything | Overrides the config/runtime directory.           |
+| `TERMINALIKA_CONFIG_DIR`      | everything, the [pi extension](/pi/#pijson) included | Overrides the config/runtime directory. |
 | `CLAUDE_CONFIG_DIR`           | `claude` | Sessions are read from `<dir>/projects`.            |
 | `PI_CODING_AGENT_SESSION_DIR` | `pi`     | Overrides the session directory directly.           |
 | `PI_CODING_AGENT_DIR`         | `pi`     | Moves the whole agent dir; sessions in `<dir>/sessions`. |

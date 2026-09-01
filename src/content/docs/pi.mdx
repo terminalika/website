@@ -1,0 +1,111 @@
+---
+title: pi extension
+description: terminalika inside pi - /play opens a game over the conversation, pi's agent_settled event pauses it, alt+g flips between them.
+---
+
+import Shell from '../../components/Shell.astro';
+
+[pi](https://pi.dev) is the one agent terminalika can live *inside*. The
+[pi-terminalika](https://github.com/terminalika/pi-terminalika) extension
+runs the same four games as an overlay over the conversation - no second
+pane, no CLI, nothing to configure. The games ship as wasm inside the
+package and run on their own worker thread, so pi streaming a long reply
+cannot starve a game tick or a held-key timer.
+
+Everything else on this site - flags, `config.json`, the setup wizard,
+webhooks, the WebSocket sidecar - describes the **CLI**. This page is the
+extension's whole surface.
+
+## install
+
+```sh
+pi install npm:pi-terminalika
+```
+
+Needs pi 0.84+ (the `agent_settled` event and overlays) on Node 22+ or Bun.
+The wasm is prebuilt and shipped in the package, so no Go toolchain is
+involved. To try it without installing: `pi -e /path/to/pi-terminalika`.
+Updating is `pi update`.
+
+## playing
+
+<Shell
+	title="pi"
+	prompt=">"
+	lines={[
+		{ type: 'input', text: '/play tetris' },
+		{ type: 'comment', text: '# the game opens as an overlay; pi keeps working under it' },
+		{ type: 'ok', text: "Pi Agent's done - you're up.", delay: 1400 },
+		{ type: 'comment', text: '# SPACE resumes · ESC parks · /play stop ends it' },
+	]}
+/>
+
+| Command / key      | What it does                                                            |
+| ------------------ | ----------------------------------------------------------------------- |
+| `/play`            | Pick a game from a list.                                                |
+| `/play snake`      | Or name one: `snake`, `tetris`, `2048`, `mines`.                        |
+| `ESC` or `alt+g`   | **Park** the game: it pauses, hides, and the keyboard goes back to pi.  |
+| `alt+g` or `/play` | Bring it back exactly where it was (unparking keeps it paused; `SPACE` resumes). |
+| `/play stop`       | End the game - the only way out.                                        |
+
+`ESC` never quits here, unlike the CLI: answering pi mid-game *is* the
+point, so `ESC` only hands the keyboard back. While a game is parked, pi's
+status line keeps a one-line reminder that it's there.
+
+In-game controls are the same as the CLI's: arrows / `WASD` to move,
+`SPACE` to pause, `R` to reset - see [usage/games](/usage/games/). There is
+no home screen and no setup wizard; `/play` is the menu.
+
+## when the agent settles
+
+The extension listens to exactly one thing: pi's own `agent_settled` event,
+the moment pi will not continue on its own. No session-file tailing, no
+webhook, no other agents. What happens then is a three-way choice, asked
+once on your first `/play`:
+
+| Mode                | What happens                                                                |
+| ------------------- | --------------------------------------------------------------------------- |
+| `pause` *(default)* | The game freezes with a one-line notice in pi's colour; `SPACE` resumes.    |
+| `settle`            | The game parks itself - keyboard back to pi, a toast points at `alt+g`.     |
+| `no_pause`          | Nothing; keep playing.                                                      |
+
+Skipping the question with `ESC` keeps the default for that run and asks
+again next time.
+
+## pi.json
+
+The choice is stored as the single key of `pi.json`, in the same
+[config directory](/usage/config/#location) the CLI uses
+(`TERMINALIKA_CONFIG_DIR` overrides it for both):
+
+```json
+{"auto_pause": "pause"}
+```
+
+Deliberately a **separate file** from the CLI's `config.json` - the two
+forms configure different things, and the CLI's `auto_pause` is a bool
+while the extension's is the three-valued string above. Editing the file by
+hand works; a missing or malformed file falls back to `"pause"`.
+
+## held keys
+
+A game that reads held keys (`KeyStateHandler`; none of the built-in ones at
+the moment) wants real key releases. Inside pi those come from the
+kitty keyboard protocol when the terminal speaks it; otherwise releases are
+synthesised from auto-repeat, exactly like the CLI's fallback. The
+[terminals table](/terminals/) applies unchanged - to whatever terminal
+(and multiplexer) **pi** is running in.
+
+## what the extension doesn't do
+
+- No flags or subcommands - the whole surface is `/play`.
+  [usage/flags](/usage/flags/) is the CLI.
+- No other agents - it hears pi's `agent_settled` and nothing else. Watching
+  Claude Code, Aider or Cursor is the [CLI's job](/agents/).
+- No webhook ingest, no `terminalika notify`, no
+  [WebSocket sidecar](/websocket/) - the wasm runs inside pi itself.
+- No high scores yet - the wasm has no filesystem, so scores live for the
+  session and BEST stays off the screen.
+- No desktop notifications - pi has extensions for that.
+
+Source: [github.com/terminalika/pi-terminalika](https://github.com/terminalika/pi-terminalika).

@@ -119,21 +119,23 @@ install -m 755 terminalika ~/.local/bin/
 <VerifyShell />
 
 :::tip[Held keys feel sticky?]
-That is your terminal (or multiplexer), not the game. Terminalika needs a
-terminal that reports key releases; see [terminals/key-releases](/terminals/).
+That is your terminal (or multiplexer), not the game - in both forms, CLI
+and extension. None of the built-in games reads held keys any more, so they
+play the same everywhere; a game that does needs a terminal that reports
+key releases - see [terminals/key-releases](/terminals/).
 :::
 
 ## extension (pi)
 
 ```sh
-pi install git:github.com/terminalika/pi-terminalika
+pi install npm:pi-terminalika
 ```
 
 Then, while pi works:
 
 ```
 /play            pick a game
-/play snake      or name one: snake, tetris, invaders, pong
+/play snake      or name one: snake, tetris, 2048, mines
 /play stop       end the game
 ```
 
@@ -141,8 +143,9 @@ The games ship as wasm inside the package and pause on pi's own
 `agent_settled` event - nothing to configure, no CLI required. `ESC` (or
 `alt+g`) parks the game and hands the keyboard back to pi; `alt+g` or
 `/play` brings it back exactly where it was; `/play stop` is the only way
-out. Needs pi 0.84+. Source and details:
-[pi-terminalika](https://github.com/terminalika/pi-terminalika).
+out. Needs pi 0.84+, on Node 22+ or Bun. The whole story - auto-pause
+modes, `pi.json`, held keys, what the extension leaves to the CLI - is on
+[pi extension](/pi/).
 
 ## updating
 
@@ -160,11 +163,13 @@ the latest release, so updating is re-running the one you used:
 
 `terminalika -version` prints what you are running; the
 [releases page](https://github.com/terminalika/terminalika/releases/latest)
-shows what is current. Your `config.json` and high scores live in your
-config directory, which no update path touches.
+shows what is current. Your settings live in your config directory, which
+no update path touches: the CLI's `config.json` and high scores, the
+extension's [`pi.json`](/pi/#pijson).
 
 ## next
 
+- [pi extension](/pi/): everything the extension does, if `pi install` was your route.
 - [usage/flags](/usage/flags/): everything the binary accepts on the command line.
 - [usage/config.json](/usage/config/): make the agent subscriptions permanent.
 - [agents](/agents/): pause the game when Claude Code or pi is waiting for you.

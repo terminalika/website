@@ -62,6 +62,7 @@ export default defineConfig({
 			sidebar: [
 				{ label: 'terminalika', slug: '' },
 				{ label: 'install', slug: 'install' },
+				{ label: 'pi extension', slug: 'pi' },
 				{ label: 'research', slug: 'research' },
 				{
 					label: 'usage/',
