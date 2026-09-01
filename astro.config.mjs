@@ -64,6 +64,7 @@ export default defineConfig({
 				{ label: 'install', slug: 'install' },
 				{ label: 'pi extension', slug: 'pi' },
 				{ label: 'research', slug: 'research' },
+				{ label: 'changelog', slug: 'changelog' },
 				{
 					label: 'usage/',
 					items: [

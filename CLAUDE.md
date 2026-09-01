@@ -62,3 +62,15 @@ driven by `data-theme` on `<html>`). To keep both modes complete:
   and completions.
 - The launcher's warning screens link to `/terminals`, `/terminals/zellij`
   and `/terminals/tmux`; keep those routes stable.
+
+## Changelog
+
+`src/content/docs/changelog.md` is a single running log, newest first.
+After any change to `terminalika`, `terminalika-core`, `pi-terminalika` or
+this site, add (don't replace) a dated section at the top - reuse today's
+date heading if one is already there - with one `### <repo>` subsection per
+repository actually touched (skip repos with nothing to report), and plain
+user-facing bullets per subsection: what changed, not commit messages or
+file names. `pi-terminalika` releases get their npm version in the heading
+(`pi-terminalika → \`0.1.2\``); the others don't version like that, so just
+the repo name.
