@@ -41,7 +41,7 @@ const { version = latestVersion } = Astro.props;
 <script>
 	type Kind = 'input' | 'output' | 'ok' | 'warn' | 'error' | 'muted';
 
-	const GAMES = ['dino', 'invaders', 'snake', 'tetris'] as const;
+	const GAMES = ['2048', 'dino', 'invaders', 'snake', 'tetris'] as const;
 	type Game = (typeof GAMES)[number];
 
 	/** Flags exactly as the Go binary defines them (alphabetical, like `flag` prints them). */
@@ -53,7 +53,7 @@ const { version = latestVersion } = Astro.props;
 		ws: { type: 'string', help: 'WebSocket base address for events/commands (empty disables)', def: '127.0.0.1:8080' },
 	};
 
-	const COMPLETIONS = ['--game=dino', '--game=invaders', '--game=snake', '--game=tetris', '--claude', '--pi', '--ws=', '--version', '-h'];
+	const COMPLETIONS = ['--game=2048', '--game=dino', '--game=invaders', '--game=snake', '--game=tetris', '--claude', '--pi', '--ws=', '--version', '-h'];
 
 	class Term {
 		root: HTMLElement;
