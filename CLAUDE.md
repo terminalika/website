@@ -68,9 +68,13 @@ driven by `data-theme` on `<html>`). To keep both modes complete:
 `src/content/docs/changelog.md` is a single running log, newest first.
 After any change to `terminalika`, `terminalika-core`, `pi-terminalika` or
 this site, add (don't replace) a dated section at the top - reuse today's
-date heading if one is already there - with one `### <repo>` subsection per
-repository actually touched (skip repos with nothing to report), and plain
-user-facing bullets per subsection: what changed, not commit messages or
+date heading if one is already there, rather than adding a second one for
+the same day - with one `### <repo>` subsection per repository actually
+touched (skip repos with nothing to report). A second change to a repo
+already listed under today's date extends that repo's existing bullet list
+- append a bullet, don't open a second `### <repo>` under the same date.
+Bullets are plain user-facing prose: what changed, not commit messages or
 file names. `pi-terminalika` releases get their npm version in the heading
-(`pi-terminalika → \`0.1.2\``); the others don't version like that, so just
-the repo name.
+(`pi-terminalika → \`0.1.2\``) - bump it in place if today's section
+already names an older version; the others don't version like that, so
+just the repo name.
