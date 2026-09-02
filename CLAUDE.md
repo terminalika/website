@@ -66,19 +66,28 @@ driven by `data-theme` on `<html>`). To keep both modes complete:
 ## Changelog
 
 `src/content/docs/changelog.md` is a single running log, newest first.
-After any change to `terminalika`, `terminalika-core`, `pi-terminalika` or
-this site, add (don't replace) a dated section at the top - reuse today's
-date heading if one is already there, rather than adding a second one for
-the same day - with one `### <repo>` subsection per repository actually
-touched (skip repos with nothing to report). A second change to a repo
-already listed under today's date extends that repo's existing bullet list
-- append a bullet, don't open a second `### <repo>` under the same date.
+After any change to `terminalika`, `terminalika-core`, `pi-play`,
+`opencode-play` or this site, add (don't replace) a dated section at the
+top - reuse today's date heading if one is already there, rather than
+adding a second one for the same day - with one `### <repo>` subsection
+per repository actually touched (skip repos with nothing to report). A
+second change to a repo already listed under today's date extends that
+repo's existing bullet list - append a bullet, don't open a second
+`### <repo>` under the same date. If a later same-day change makes an
+earlier same-day bullet inaccurate or stale (not just additive - e.g. a
+table it described as "not yet" now has the thing), edit or remove that
+bullet instead of leaving both: today's section should describe today's
+actual end state, not the sequence of edits that got there.
+
 Bullets are plain user-facing prose: what changed, not commit messages or
 file names. A bump that ships with an actual tagged/published release gets
-that version in the heading (`terminalika → \`v0.6.1\``, `pi-terminalika →
-\`0.1.2\``) - bump it in place if today's section already names an older
-version; a change with no release of its own (this site's own commits,
-most days) just gets the bare repo name. Every `### <repo>` heading is a
-link to that repo's GitHub page (`github.com/terminalika/<repo>`) - the
-repo name is the link text, the version suffix (if any) sits outside the
-link.
+that version in the heading (`terminalika → \`v0.6.2\``, `pi-play →
+\`0.1.0\``) - bump the heading in place only for a genuinely new release
+(a new tag/publish) of a repo already listed today; a change that lands
+*after* a same-day version was already tagged and released is a separate
+new version of its own (new heading bump, own bullets), never a rewrite
+of what that earlier tag actually shipped. A change with no release of
+its own (this site's own commits, most days) just gets the bare repo
+name. Every `### <repo>` heading is a link to that repo's GitHub page
+(`github.com/terminalika/<repo>`) - the repo name is the link text, the
+version suffix (if any) sits outside the link.
