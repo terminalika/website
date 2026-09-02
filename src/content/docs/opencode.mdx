@@ -1,0 +1,120 @@
+---
+title: opencode extension
+description: terminalika inside opencode - /play opens a game on a full-screen route, opencode's session.idle event pauses it, alt+g flips between them.
+---
+
+import Shell from '../../components/Shell.astro';
+
+[opencode](https://opencode.ai) is the other agent terminalika can live
+*inside*. The [opencode-play](https://github.com/terminalika/opencode-play)
+plugin runs the same four games on a full-screen route over the
+conversation - no second pane, no CLI, nothing to configure. The games
+ship as wasm inside the package.
+
+Everything else on this site - flags, `config.json`, the setup wizard,
+webhooks, the WebSocket sidecar - describes the **CLI**. This page is the
+extension's whole surface.
+
+## install
+
+Declare the plugin in your TUI config - `~/.config/opencode/tui.json` for
+every project, or a project's own `.opencode/tui.json`:
+
+```json
+{
+  "$schema": "https://opencode.ai/tui.json",
+  "plugin": ["opencode-play"]
+}
+```
+
+Needs opencode 1.18+. The wasm is prebuilt and shipped in the package, so
+no Go toolchain is involved.
+
+## playing
+
+<Shell
+	title="opencode"
+	prompt=">"
+	lines={[
+		{ type: 'input', text: '/play tetris' },
+		{ type: 'comment', text: '# the game opens on a full-screen route; opencode keeps working under it' },
+		{ type: 'ok', text: "opencode's done - you're up.", delay: 1400 },
+		{ type: 'comment', text: '# SPACE resumes · ESC parks · alt+g picks · /play-stop ends it' },
+	]}
+/>
+
+| Command / key      | What it does                                                            |
+| ------------------- | ----------------------------------------------------------------------- |
+| `/play`             | Back to the parked game, or pick one from a list.                       |
+| `/play-menu`        | The game menu - also `alt+g`, from either side: the editor or mid-game. |
+| `alt+g`             | Same menu. The game that is on leads (Enter resumes it), "Return to opencode" right under it, then every other game to swap to. |
+| `ESC`               | **Park** the game: it pauses, hides, and the keyboard goes back to opencode. |
+| `/play`             | Bring it back exactly where it was (unparking keeps it paused; `SPACE` resumes). |
+| `/play-stop`        | End the game - the only way out.                                        |
+
+On a Mac `alt+g` reads `option+g` everywhere the extension names it; the
+binding does not change.
+
+`ESC` never quits here, unlike the CLI: answering opencode mid-game *is*
+the point, so `ESC` only hands the keyboard back.
+
+In-game controls are the same as the CLI's: arrows / `WASD` to move,
+`SPACE` to pause, `R` to reset - see [usage/games](/usage/games/). There is
+no home screen and no setup wizard; `/play` is the menu.
+
+## when the session goes idle
+
+The extension listens to exactly one thing: opencode's own `session.idle`
+event, the moment the agent will not continue on its own - the same event
+the built-in "attention" notifications use. No session-file tailing, no
+webhook, no other agents. What happens then is a three-way choice, asked
+once on your first `/play`:
+
+| Mode                | What happens                                                                |
+| -------------------- | --------------------------------------------------------------------------- |
+| `pause` *(default)* | The game freezes with a one-line notice in opencode's colour; `SPACE` resumes. |
+| `settle`            | The game parks itself - keyboard back to opencode.                          |
+| `no_pause`          | Nothing; keep playing.                                                      |
+
+Cancelling the question keeps the default for that run and asks again next
+time.
+
+## where the choice lives
+
+The answer is kept in opencode's own plugin `kv` store, under
+`terminalika.auto_pause` - not a file terminalika writes itself. That
+follows from how the extension is hosted: no filesystem access of its own,
+just whatever the opencode plugin API hands it. The pi extension's
+[`pi.json`](/pi/#pijson) is a real file for the same reason the CLI's
+`config.json` is; this one lives wherever opencode keeps its own plugin
+state.
+
+## held keys
+
+A game that reads held keys (`KeyStateHandler`; none of the built-in ones
+at the moment) wants real key releases. Inside opencode those come from
+the kitty keyboard protocol when the terminal speaks it - the same
+protocol opencode's own editor uses, so if you can hold a key there, the
+games see releases too; otherwise releases are synthesised from
+auto-repeat, exactly like the CLI's fallback. The [terminals
+table](/terminals/) applies unchanged - to whatever terminal (and
+multiplexer) **opencode** is running in.
+
+## what the extension doesn't do
+
+- No flags or subcommands - the whole surface is `/play`.
+  [usage/flags](/usage/flags/) is the CLI.
+- No other agents - it hears opencode's `session.idle` and nothing else.
+  Watching Claude Code, pi, Aider or Cursor is the [CLI's job](/agents/).
+- No webhook ingest, no `terminalika notify`, no
+  [WebSocket sidecar](/websocket/) - the wasm runs inside opencode itself.
+- No high scores yet - the wasm has no filesystem, so scores live for the
+  session and BEST stays off the screen.
+- No worker thread yet - v1 runs the wasm on opencode's own TUI process;
+  Go's wasm_exec schedules through the event loop, so a streaming reply
+  hasn't been seen to starve a game tick. The pi extension's
+  worker-thread split is the known fix if that ever changes.
+- No desktop notifications - opencode has its own "attention" system for
+  that.
+
+Source: [github.com/terminalika/opencode-play](https://github.com/terminalika/opencode-play).

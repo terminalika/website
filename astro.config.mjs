@@ -63,6 +63,7 @@ export default defineConfig({
 				{ label: 'terminalika', slug: '' },
 				{ label: 'install', slug: 'install' },
 				{ label: 'pi extension', slug: 'pi' },
+				{ label: 'opencode extension', slug: 'opencode' },
 				{
 					label: 'the cli/',
 					items: [

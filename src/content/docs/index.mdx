@@ -4,7 +4,7 @@ description: Stop doomscrolling while waiting for your AI agent. Stay in your te
 template: splash
 hero:
   title: '<img class="tk-hero-logo" src="/logo.svg" alt="" width="96" height="96" />terminalika'
-  tagline: Stop doomscrolling while waiting for your AI agent. Stay in your terminal, fill the wait with a retro game, get notified the millisecond your prompt finishes.<br/><br/>Available as a standalone CLI and as a <a href="/pi/">pi plugin</a>.
+  tagline: Stop doomscrolling while waiting for your AI agent. Stay in your terminal, fill the wait with a retro game, get notified the millisecond your prompt finishes.<br/><br/>Available as a standalone CLI, a <a href="/pi/">pi plugin</a> or an <a href="/opencode/">opencode plugin</a>.
   actions:
     - text: install
       link: /install/
@@ -28,25 +28,28 @@ import DemoCarousel from '../../components/DemoCarousel.astro';
 
    Start a task in Claude Code, Pi, Aider or Cursor, open `terminalika` in
    the next pane and pick Snake, Tetris, 2048 or Minesweeper. They are
-   built to be dropped mid-move; that's the point. In pi there is no next
-   pane: the [pi plugin](/pi/) opens the game right over the conversation
-   with `/play`.
+   built to be dropped mid-move; that's the point. In pi or opencode
+   there is no next pane: the [pi plugin](/pi/) or
+   [opencode plugin](/opencode/) opens the game right over the
+   conversation with `/play`.
 
 2. **It listens for the agent.**
 
    terminalika tails the agent's own session files - no hooks, no proxy,
    nothing leaves your machine (Cursor and anything else post one line from
-   a hook; the pi plugin gets pi's own `agent_settled` event). Two events
-   matter: *finished* and *needs your input*. Either one freezes the game
-   with a one-line notice in the agent's colour.
+   a hook; the pi and opencode plugins get the agent's own settled event -
+   `agent_settled` in pi, `session.idle` in opencode). Two events matter:
+   *finished* and *needs your input*. Either one freezes the game with a
+   one-line notice in the agent's colour.
 
 3. **The agent is one pane away.**
 
    The game is already paused - switch panes, answer, come back whenever.
-   The game and your score are where you left them. In pi, not even that:
-   `ESC` parks the game, you answer in the same window, `/play` brings it
-   back exactly where it was. No desktop popups, no background process:
-   terminalika is a game launcher, not a notification service.
+   The game and your score are where you left them. In pi or opencode,
+   not even that: `ESC` parks the game, you answer in the same window,
+   `/play` brings it back exactly where it was. No desktop popups, no
+   background process: terminalika is a game launcher, not a notification
+   service.
 
 </Steps>
 
@@ -87,9 +90,9 @@ proxy, nothing injected, nothing sent anywhere.
 <summary>Which agents?</summary>
 
 Claude Code, Pi Agent and Aider natively. Cursor CLI - and any tool with a
-hook - through `terminalika notify`. See [agents](/agents/). In pi the
-games can also run *inside* the agent itself, as the
-[pi extension](/pi/) - no CLI at all.
+hook - through `terminalika notify`. See [agents](/agents/). In pi or
+opencode the games can also run *inside* the agent itself, as the
+[pi extension](/pi/) or [opencode extension](/opencode/) - no CLI at all.
 
 </details>
 <details>
@@ -106,8 +109,9 @@ nothing to notify. Turn agent tracking on later any time with
 
 Two events only: the agent *finished*, or it *needs your input*. Tool calls
 and subagent chatter are ignored; the same event within three seconds is
-deduplicated. The [pi extension](/pi/) is even narrower: pi's own
-`agent_settled` event, nothing else.
+deduplicated. The [pi](/pi/) and [opencode](/opencode/) extensions are
+even narrower: pi's own `agent_settled` event, or opencode's own
+`session.idle`, nothing else.
 
 </details>
 <details>
@@ -115,16 +119,18 @@ deduplicated. The [pi extension](/pi/) is even narrower: pi's own
 
 In the game, and only there: the pause notice, a corner banner if you
 turned auto-pause off, a toast on the home screen. In the
-[pi extension](/pi/), the same pause notice - or a toast pointing at
-`/play` if you chose the settle mode. No desktop notifications either way.
+[pi](/pi/) or [opencode](/opencode/) extension, the same pause notice -
+or a toast pointing at `/play` if you chose the settle mode. No desktop
+notifications either way.
 
 </details>
 <details>
 <summary>Can I answer the agent from inside the game?</summary>
 
-With the [pi plugin](/pi/), yes: the game is an overlay inside pi itself,
-so `ESC` parks it, you answer right there, and `/play` brings it back where
-it was. With the CLI the agent is one pane away - switch, answer, come back.
+With the [pi](/pi/) or [opencode](/opencode/) plugin, yes: the game is an
+overlay or full-screen route inside the agent itself, so `ESC` parks it,
+you answer right there, and `/play` brings it back where it was. With the
+CLI the agent is one pane away - switch, answer, come back.
 
 </details>
 <details>
@@ -132,7 +138,8 @@ it was. With the CLI the agent is one pane away - switch, answer, come back.
 
 All three. Held keys feel best in a terminal that reports key releases;
 [terminals](/terminals/) has the list and the fixes. For the
-[pi extension](/pi/) the terminal that matters is the one pi runs in.
+[pi](/pi/) or [opencode](/opencode/) extension the terminal that matters
+is the one pi or opencode runs in.
 
 </details>
 <details>
@@ -157,6 +164,7 @@ A short version of the sidebar on the left, if this page is all you've seen so f
 | ---------------------------------------- | --------------------------------------- |
 | install it                               | [install](/install/)                    |
 | play inside pi, no CLI                   | [pi extension](/pi/)                    |
+| play inside opencode, no CLI             | [opencode extension](/opencode/)        |
 | see every command line flag              | [usage/flags](/usage/flags/)            |
 | make settings stick without flags        | [usage/config.json](/usage/config/)     |
 | pause the game when my agent needs me    | [agents](/agents/)                      |

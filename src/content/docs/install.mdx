@@ -1,24 +1,26 @@
 ---
 title: install
-description: The CLI for any agent, or the pi extension - and which one fits your agent.
+description: The CLI for any agent, or the pi/opencode extensions - and which one fits your agent.
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import VerifyShell from '../../components/VerifyShell.astro';
 
-terminalika comes in two forms. The **CLI** is a standalone launcher that
+terminalika comes in three forms. The **CLI** is a standalone launcher that
 runs in the pane next to any agent and watches the agent's own transcript
-(or takes a hook). The **extension** puts the same games *inside*
-[pi](https://pi.dev), as an overlay - no second pane, no CLI needed.
+(or takes a hook). The **extensions** put the same games *inside*
+[pi](https://pi.dev) or [opencode](https://opencode.ai), as an overlay or a
+full-screen route - no second pane, no CLI needed.
 
-| Method                                                          | CLI | Extension (pi) |
-| --------------------------------------------------------------- | :-: | :------------: |
-| [Homebrew](#package-managers) (macOS / Linux)                   |  ✓  |       -        |
-| [Scoop](#package-managers) (Windows)                            |  ✓  |       -        |
-| [`.deb` / `.rpm` / `.pkg.tar.zst` / `.apk`](#linux-packages)     |  ✓  |       -        |
-| [Raw binary](#raw-binaries) (`tar.gz` / `zip`)                  |  ✓  |       -        |
-| [`go install`](#package-managers) (Go 1.24+)                    |  ✓  |       -        |
-| [`pi install`](#extension-pi)                                   |  -  |       ✓        |
+| Method                                                          | CLI | Extension (pi) | Extension (opencode) |
+| --------------------------------------------------------------- | :-: | :------------: | :-------------------: |
+| [Homebrew](#package-managers) (macOS / Linux)                   |  ✓  |       -        |           -            |
+| [Scoop](#package-managers) (Windows)                            |  ✓  |       -        |           -            |
+| [`.deb` / `.rpm` / `.pkg.tar.zst` / `.apk`](#linux-packages)     |  ✓  |       -        |           -            |
+| [Raw binary](#raw-binaries) (`tar.gz` / `zip`)                  |  ✓  |       -        |           -            |
+| [`go install`](#package-managers) (Go 1.24+)                    |  ✓  |       -        |           -            |
+| [`pi install`](#extension-pi)                                   |  -  |       ✓        |           -            |
+| [`tui.json` plugin array](#extension-opencode)                  |  -  |       -        |           ✓            |
 
 ## which one for your agent
 
@@ -30,6 +32,7 @@ games run inside the agent.
 | ----------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------ |
 | Claude Code | ✓ tails `~/.claude/projects`: end of turn, `AskUserQuestion`  | optional: [`Notification`/`Stop` hooks](/events/#claude-code-hooks) add permission prompts | - (Claude Code has no UI API)  |
 | Pi Agent    | ✓ tails `~/.pi/agent/sessions`                                | none                                                                          | ✓ [pi-play](#extension-pi) (`/play`) |
+| opencode    | - (not yet)                                                    | -                                                                              | ✓ [opencode-play](#extension-opencode) (`/play`) |
 | Aider       | ✓ tails `.aider.chat.history.md` (best effort)                 | recommended: [`--notifications-command`](/events/#aider)                       | -                              |
 | Cursor CLI  | - (no session files)                                           | required: [`stop` hook](/events/#cursor-cli-hooks) → `terminalika notify`      | -                              |
 
@@ -119,8 +122,8 @@ install -m 755 terminalika ~/.local/bin/
 <VerifyShell />
 
 :::tip[Held keys feel sticky?]
-That is your terminal (or multiplexer), not the game - in both forms, CLI
-and extension. None of the built-in games reads held keys any more, so they
+That is your terminal (or multiplexer), not the game - in all three forms.
+None of the built-in games reads held keys any more, so they
 play the same everywhere; a game that does needs a terminal that reports
 key releases - see [terminals/key-releases](/terminals/).
 :::
@@ -147,6 +150,32 @@ the only way out. Needs pi 0.84+, on Node 22+ or Bun. The whole story - auto-pau
 modes, `pi.json`, held keys, what the extension leaves to the CLI - is on
 [pi extension](/pi/).
 
+## extension (opencode)
+
+```json
+{
+  "$schema": "https://opencode.ai/tui.json",
+  "plugin": ["opencode-play"]
+}
+```
+
+In `~/.config/opencode/tui.json` for every project, or a project's own
+`.opencode/tui.json`. Then, while opencode works:
+
+```
+/play            back to the parked game, or pick one
+/play-menu       the game menu (also alt+g, from either side)
+/play-stop       end the game - the only way out
+```
+
+The games ship as wasm inside the package and pause on opencode's own
+`session.idle` event - nothing to configure, no CLI required. `ESC` parks
+the game on a full-screen route and hands the keyboard back to opencode;
+`/play` brings it back exactly where it was; `alt+g` opens the menu from
+either side, the editor or mid-game; `/play-stop` is the only way out.
+Needs opencode 1.18+. The whole story - auto-pause modes, held keys, what
+the extension leaves to the CLI - is on [opencode extension](/opencode/).
+
 ## updating
 
 Neither form updates itself. Every install command on this page resolves to
@@ -160,16 +189,19 @@ the latest release, so updating is re-running the one you used:
 | a distro package (deb/rpm/zst/apk) | the same two lines from [linux packages](#linux-packages) |
 | a raw binary                       | the same three lines from [raw binaries](#raw-binaries)  |
 | `pi install`                       | `pi update`                                              |
+| `tui.json` plugin array            | opencode re-resolves the package; see opencode's own docs for pinning/updating plugin versions |
 
 `terminalika -version` prints what you are running; the
 [releases page](https://github.com/terminalika/terminalika/releases/latest)
 shows what is current. Your settings live in your config directory, which
-no update path touches: the CLI's `config.json` and high scores, the
-extension's [`pi.json`](/pi/#pijson).
+no update path touches: the CLI's `config.json` and high scores, the pi
+extension's [`pi.json`](/pi/#pijson); the opencode extension keeps its one
+setting in opencode's own plugin storage, not a file of its own.
 
 ## next
 
 - [pi extension](/pi/): everything the extension does, if `pi install` was your route.
+- [opencode extension](/opencode/): everything the extension does, if `tui.json` was your route.
 - [usage/flags](/usage/flags/): everything the binary accepts on the command line.
 - [usage/config.json](/usage/config/): make the agent subscriptions permanent.
 - [agents](/agents/): pause the game when Claude Code or pi is waiting for you.
