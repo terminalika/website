@@ -6,6 +6,17 @@ description: What shipped, by repository — newest first.
 Every update across the terminalika repositories, newest first, grouped by
 repository. See [development](/development/) for what each repository is.
 
+## 2026-09-02
+
+### website
+
+- Reworked the sidebar into two tracks: `pi extension` on its own, and
+  every CLI page folded under a new "the cli/" group - previously they
+  sat in one flat list. `agents/pi` (the CLI watching pi's session files)
+  is now labeled "pi (as an agent)" so it stops reading like the
+  unrelated "pi extension" entry above it. No page content or URLs
+  changed.
+
 ## 2026-09-01
 
 ### pi-terminalika → `0.1.2`
