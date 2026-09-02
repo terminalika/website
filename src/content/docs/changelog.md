@@ -24,6 +24,8 @@ repository. See [development](/development/) for what each repository is.
   unrelated "pi extension" entry above it. No page content or URLs
   changed.
 - Added a homepage FAQ entry for the new "just play" setup choice.
+- Dropped a redundant homepage FAQ entry; rounded out "where to go next"
+  with the research and changelog pages, missing there entirely.
 
 ## 2026-09-01
 
