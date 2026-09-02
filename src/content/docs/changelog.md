@@ -8,12 +8,16 @@ repository. See [development](/development/) for what each repository is.
 
 ## 2026-09-02
 
-### [terminalika](https://github.com/terminalika/terminalika) → `v0.6.1`
+### [terminalika](https://github.com/terminalika/terminalika) → `v0.6.2`
 
 - Setup now asks up front how you want to use terminalika: watch AI
   agents (the existing flow), or just play - which skips the agent and
   auto-pause questions entirely and saves a plain game-launcher config,
   nothing watched, nothing configured.
+- OpenCode joins the agent list. It keeps its sessions in a SQLite
+  database, not a file terminalika can tail, so it's hook-only, the same
+  shape as Cursor CLI: a small plugin calling `terminalika notify --agent
+  opencode` on `session.idle`.
 
 ### [terminalika-core](https://github.com/terminalika/terminalika-core) → `v0.7.0`
 
@@ -62,6 +66,11 @@ repository. See [development](/development/) for what each repository is.
   auto-pause modes, held keys, what it doesn't do - matching the pi
   extension's depth. Also in the sidebar, the install page's comparison
   table, and every homepage mention that used to name pi alone.
+- The homepage hero: "a pi plugin or an opencode plugin" collapsed into
+  "a plugin for pi and opencode" - one clause instead of a growing list.
+- Documented the CLI watching OpenCode: the plugin snippet for
+  `opencode.json`, and a row in both agent-comparison tables (install,
+  agents).
 
 ## 2026-09-01
 
