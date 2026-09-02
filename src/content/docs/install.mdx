@@ -29,7 +29,7 @@ games run inside the agent.
 | Agent       | 1 · CLI, out of the box                                       | 2 · CLI, agent-side config                                                    | 3 · Extension inside the agent |
 | ----------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------ |
 | Claude Code | ✓ tails `~/.claude/projects`: end of turn, `AskUserQuestion`  | optional: [`Notification`/`Stop` hooks](/events/#claude-code-hooks) add permission prompts | - (Claude Code has no UI API)  |
-| Pi Agent    | ✓ tails `~/.pi/agent/sessions`                                | none                                                                          | ✓ [pi-terminalika](#extension-pi) (`/play`) |
+| Pi Agent    | ✓ tails `~/.pi/agent/sessions`                                | none                                                                          | ✓ [pi-play](#extension-pi) (`/play`) |
 | Aider       | ✓ tails `.aider.chat.history.md` (best effort)                 | recommended: [`--notifications-command`](/events/#aider)                       | -                              |
 | Cursor CLI  | - (no session files)                                           | required: [`stop` hook](/events/#cursor-cli-hooks) → `terminalika notify`      | -                              |
 
@@ -128,7 +128,7 @@ key releases - see [terminals/key-releases](/terminals/).
 ## extension (pi)
 
 ```sh
-pi install npm:pi-terminalika
+pi install npm:@terminalika/pi-play
 ```
 
 Then, while pi works:

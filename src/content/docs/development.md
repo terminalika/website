@@ -11,7 +11,8 @@ Terminalika is split across the `terminalika` GitHub organisation:
 | ----------------------------------------------------------------- | ----------------------------------------------------------- |
 | [`terminalika/terminalika-core`](https://github.com/terminalika/terminalika-core) | Library: the `Game` contract, registry, event bus, built-in games, high scores. Headless; renders into whatever `tcell.Screen` it is given. |
 | [`terminalika/terminalika`](https://github.com/terminalika/terminalika)           | The CLI launcher: menu, engine, key-release handling, agent watchers, WebSocket sidecar, packaging. |
-| [`terminalika/pi-terminalika`](https://github.com/terminalika/pi-terminalika)     | The [pi extension](/pi/): the games compiled to wasm, run on a worker thread inside pi, driven by a trimmed TypeScript port of the launcher's engine. |
+| [`terminalika/pi-play`](https://github.com/terminalika/pi-play)     | The [pi extension](/pi/): the games compiled to wasm, run on a worker thread inside pi, driven by a trimmed TypeScript port of the launcher's engine. |
+| [`terminalika/opencode-play`](https://github.com/terminalika/opencode-play)     | The opencode plugin: the same wasm build of the games, on a full-screen TUI route inside opencode. |
 | [`terminalika/homebrew-tap`](https://github.com/terminalika/homebrew-tap)         | Homebrew cask, pushed by the release pipeline.              |
 | [`terminalika/scoop-bucket`](https://github.com/terminalika/scoop-bucket)         | Scoop manifest, pushed by the release pipeline.             |
 | [`terminalika/website`](https://github.com/terminalika/website)                   | This site.                                                  |
@@ -43,12 +44,16 @@ cd terminalika-core && go test ./...
 cd terminalika      && go test ./...
 ```
 
-The pi extension follows the same sibling-checkout pattern with its own
-scripts: `npm run build:wasm` recompiles `wasm/terminalika.wasm` from the
-local core (the built wasm is committed, so users never need Go), and
-`npm run test:wasm` boots it headlessly. It releases to npm as
-[`pi-terminalika`](https://www.npmjs.com/package/pi-terminalika), which
-`pi install npm:pi-terminalika` resolves.
+The pi and opencode extensions follow the same sibling-checkout pattern
+with their own scripts: `npm run build:wasm` recompiles
+`wasm/terminalika.wasm` from the local core (the built wasm is committed,
+so users never need Go), and `npm run test:wasm` boots it headlessly. The
+pi extension releases to npm as
+[`@terminalika/pi-play`](https://www.npmjs.com/package/@terminalika/pi-play),
+which `pi install npm:@terminalika/pi-play` resolves; the opencode
+extension as
+[`opencode-play`](https://www.npmjs.com/package/opencode-play), declared
+in `tui.json`'s `plugin` array.
 
 ## the game contract
 

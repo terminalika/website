@@ -16,7 +16,7 @@ the CLI; can the games run inside the agent.
 | Agent       | id       | 1 · CLI, out of the box                                       | 2 · CLI, agent-side config                                                    | 3 · Extension inside the agent |
 | ----------- | -------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------ |
 | Claude Code | `claude` | ✓ [session transcripts](/agents/claude/): end of turn, `AskUserQuestion` | optional: [hooks](/events/#claude-code-hooks) add permission prompts     | - (Claude Code has no UI API)  |
-| Pi Agent    | `pi`     | ✓ [session files](/agents/pi/)                                | none                                                                          | ✓ [pi-terminalika](/pi/) (`/play`) |
+| Pi Agent    | `pi`     | ✓ [session files](/agents/pi/)                                | none                                                                          | ✓ [pi-play](/pi/) (`/play`) |
 | Aider       | `aider`  | ✓ chat history (best effort)                                   | recommended: [`--notifications-command`](/events/#aider)                       | -                              |
 | Cursor CLI  | `cursor` | - (no session files)                                           | required: [`stop` hook](/events/#cursor-cli-hooks) → `terminalika notify`      | -                              |
 

@@ -6,7 +6,7 @@ description: terminalika inside pi - /play opens a game over the conversation, p
 import Shell from '../../components/Shell.astro';
 
 [pi](https://pi.dev) is the one agent terminalika can live *inside*. The
-[pi-terminalika](https://github.com/terminalika/pi-terminalika) extension
+[pi-play](https://github.com/terminalika/pi-play) extension
 runs the same four games as an overlay over the conversation - no second
 pane, no CLI, nothing to configure. The games ship as wasm inside the
 package and run on their own worker thread, so pi streaming a long reply
@@ -19,12 +19,12 @@ extension's whole surface.
 ## install
 
 ```sh
-pi install npm:pi-terminalika
+pi install npm:@terminalika/pi-play
 ```
 
 Needs pi 0.84+ (the `agent_settled` event and overlays) on Node 22+ or Bun.
 The wasm is prebuilt and shipped in the package, so no Go toolchain is
-involved. To try it without installing: `pi -e /path/to/pi-terminalika`.
+involved. To try it without installing: `pi -e /path/to/pi-play`.
 Updating is `pi update`.
 
 ## playing
@@ -117,4 +117,4 @@ synthesised from auto-repeat, exactly like the CLI's fallback. The
   session and BEST stays off the screen.
 - No desktop notifications - pi has extensions for that.
 
-Source: [github.com/terminalika/pi-terminalika](https://github.com/terminalika/pi-terminalika).
+Source: [github.com/terminalika/pi-play](https://github.com/terminalika/pi-play).
