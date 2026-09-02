@@ -48,6 +48,7 @@ either way.
 | Pi Agent    | `pi`     | Tails `~/.pi/agent/sessions/**/*.jsonl`: terminal stop reason → `finished`. Or skip all this and play [inside pi](/pi/). | yes              |
 | Aider       | `aider`  | Tails `.aider.chat.history.md` in the working directory: a new assistant reply → `finished` (best effort). | recommended: `--notifications-command` |
 | Cursor CLI  | `cursor` | none                                                                                    | required: `stop` hook |
+| OpenCode    | `opencode` | none - keeps its sessions in a SQLite database, not a taileable file. Or skip all this and play [inside opencode](/opencode/). | required: a plugin |
 
 Native detection needs nothing installed on the agent side. Every selected
 agent is monitored **concurrently**, on the home screen and inside a game.
@@ -149,6 +150,28 @@ aider --notifications --notifications-command "terminalika notify --agent aider"
 
 (or `notifications-command: terminalika notify --agent aider` in
 `.aider.conf.yml`).
+
+### OpenCode plugin
+
+OpenCode has no hook config file - a plugin's `event` handler does the
+same job. In `opencode.json` (or a project's `.opencode/opencode.json`):
+
+```json
+{"plugin": ["./notify-terminalika.ts"]}
+```
+
+```ts title="notify-terminalika.ts"
+export const NotifyTerminalika = async ({ $ }: { $: Bun.Shell }) => ({
+  event: async ({ event }: { event: { type: string } }) => {
+    if (event.type === "session.idle") {
+      await $`terminalika notify --agent opencode`;
+    }
+  },
+});
+```
+
+Playing [inside opencode](/opencode/) instead needs none of this - the
+extension hears `session.idle` directly.
 
 ### disabling the endpoint
 

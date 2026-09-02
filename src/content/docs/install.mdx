@@ -32,7 +32,7 @@ games run inside the agent.
 | ----------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------ |
 | Claude Code | ✓ tails `~/.claude/projects`: end of turn, `AskUserQuestion`  | optional: [`Notification`/`Stop` hooks](/events/#claude-code-hooks) add permission prompts | - (Claude Code has no UI API)  |
 | Pi Agent    | ✓ tails `~/.pi/agent/sessions`                                | none                                                                          | ✓ [pi-play](#extension-pi) (`/play`) |
-| opencode    | - (not yet)                                                    | -                                                                              | ✓ [opencode-play](#extension-opencode) (`/play`) |
+| opencode    | - (no session files)                                           | required: [a plugin](/events/#opencode-plugin) → `terminalika notify`         | ✓ [opencode-play](#extension-opencode) (`/play`) |
 | Aider       | ✓ tails `.aider.chat.history.md` (best effort)                 | recommended: [`--notifications-command`](/events/#aider)                       | -                              |
 | Cursor CLI  | - (no session files)                                           | required: [`stop` hook](/events/#cursor-cli-hooks) → `terminalika notify`      | -                              |
 

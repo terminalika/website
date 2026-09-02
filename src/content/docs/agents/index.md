@@ -19,6 +19,7 @@ the CLI; can the games run inside the agent.
 | Pi Agent    | `pi`     | ✓ [session files](/agents/pi/)                                | none                                                                          | ✓ [pi-play](/pi/) (`/play`) |
 | Aider       | `aider`  | ✓ chat history (best effort)                                   | recommended: [`--notifications-command`](/events/#aider)                       | -                              |
 | Cursor CLI  | `cursor` | - (no session files)                                           | required: [`stop` hook](/events/#cursor-cli-hooks) → `terminalika notify`      | -                              |
+| OpenCode    | `opencode` | - (no session files)                                         | required: [a plugin](/events/#opencode-plugin) → `terminalika notify`         | ✓ [opencode-play](/opencode/) (`/play`) |
 
 All selected agents are monitored at the same time. The full event model -
 the two event kinds, auto-pause, and the webhook any tool can post to - is
@@ -26,10 +27,10 @@ on the [events](/events/) page.
 
 ## how it works
 
-No bridge process, no server mode, no plugin on the agent side - pi being
-the one exception where a plugin exists, the [pi plugin](/pi/), and it is
-the better fit there (it skips the tailing below entirely and listens to
-pi's own `agent_settled` event). Each agent
+No bridge process, no server mode, no plugin on the agent side for the
+agents below - pi and opencode are the exceptions, each with its own
+plugin ([pi](/pi/), [opencode](/opencode/)) that skips the tailing below
+entirely and listens to the agent's own settled event directly. Each agent
 writes its conversation to a session file on disk as it goes; terminalika
 **tails** that file and looks for one specific thing: a new assistant
 message whose stop reason means *"I'm done, your turn"*. Messages that are
