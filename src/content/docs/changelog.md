@@ -8,6 +8,13 @@ repository. See [development](/development/) for what each repository is.
 
 ## 2026-09-02
 
+### terminalika
+
+- Setup now asks up front how you want to use terminalika: watch AI
+  agents (the existing flow), or just play - which skips the agent and
+  auto-pause questions entirely and saves a plain game-launcher config,
+  nothing watched, nothing configured.
+
 ### website
 
 - Reworked the sidebar into two tracks: `pi extension` on its own, and
@@ -16,6 +23,7 @@ repository. See [development](/development/) for what each repository is.
   is now labeled "pi (as an agent)" so it stops reading like the
   unrelated "pi extension" entry above it. No page content or URLs
   changed.
+- Added a homepage FAQ entry for the new "just play" setup choice.
 
 ## 2026-09-01
 
