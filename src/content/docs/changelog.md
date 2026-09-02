@@ -23,6 +23,26 @@ repository. See [development](/development/) for what each repository is.
 - 2048's empty cells are tinted to read as part of the board, instead of
   floating on the terminal's own background.
 
+### [pi-play](https://github.com/terminalika/pi-play) → `0.1.0`
+
+- Renamed from pi-terminalika: `/play` is the actual command surface, so
+  the package now reads as what it does at a glance in pi's own search.
+  `pi-play` itself was already taken on npm by an unrelated package, so
+  it publishes as the scoped `@terminalika/pi-play` instead - install
+  with `pi install npm:@terminalika/pi-play`.
+- `pi-terminalika` stays published on npm, deprecated, pointing here.
+
+### [opencode-play](https://github.com/terminalika/opencode-play) → `0.1.0`
+
+- First release: terminalika inside [opencode](https://opencode.ai), the
+  pi extension's sibling - the same wasm build of the games, on a
+  full-screen TUI route instead of an overlay. `/play`, `/play-menu`,
+  `/play-stop`; `alt+g` opens the game menu from either side, the editor
+  or mid-game, matching pi-play's own menu; auto-pauses on opencode's
+  `session.idle` event.
+- Install by adding `"opencode-play"` to your `tui.json`'s `plugin`
+  array.
+
 ### [website](https://github.com/terminalika/website)
 
 - Reworked the sidebar into two tracks: `pi extension` on its own, and
@@ -35,6 +55,9 @@ repository. See [development](/development/) for what each repository is.
 - Dropped a redundant homepage FAQ entry; rounded out "where to go next"
   with the research and changelog pages, missing there entirely.
 - Each repo heading on this page now links to its GitHub repo.
+- Every live `pi-terminalika` reference (install snippets, the repo
+  table, the agents comparison) now points at `pi-play`; added
+  `opencode-play` to the repo table.
 
 ## 2026-09-01
 
