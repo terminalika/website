@@ -58,6 +58,10 @@ repository. See [development](/development/) for what each repository is.
 - Every live `pi-terminalika` reference (install snippets, the repo
   table, the agents comparison) now points at `pi-play`; added
   `opencode-play` to the repo table.
+- The opencode extension gets its own page - install, the `/play` table,
+  auto-pause modes, held keys, what it doesn't do - matching the pi
+  extension's depth. Also in the sidebar, the install page's comparison
+  table, and every homepage mention that used to name pi alone.
 
 ## 2026-09-01
 
