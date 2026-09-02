@@ -8,12 +8,20 @@ repository. See [development](/development/) for what each repository is.
 
 ## 2026-09-02
 
-### [terminalika](https://github.com/terminalika/terminalika)
+### [terminalika](https://github.com/terminalika/terminalika) → `v0.6.1`
 
 - Setup now asks up front how you want to use terminalika: watch AI
   agents (the existing flow), or just play - which skips the agent and
   auto-pause questions entirely and saves a plain game-launcher config,
   nothing watched, nothing configured.
+
+### [terminalika-core](https://github.com/terminalika/terminalika-core) → `v0.7.0`
+
+- A game's hint line now wraps onto more lines instead of hanging off a
+  narrow surface; a launcher that sizes itself to the game (like pi's
+  overlay) gets the extra rows instead of a clipped hint.
+- 2048's empty cells are tinted to read as part of the board, instead of
+  floating on the terminal's own background.
 
 ### [website](https://github.com/terminalika/website)
 

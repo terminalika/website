@@ -74,9 +74,11 @@ touched (skip repos with nothing to report). A second change to a repo
 already listed under today's date extends that repo's existing bullet list
 - append a bullet, don't open a second `### <repo>` under the same date.
 Bullets are plain user-facing prose: what changed, not commit messages or
-file names. `pi-terminalika` releases get their npm version in the heading
-(`pi-terminalika → \`0.1.2\``) - bump it in place if today's section
-already names an older version; the others don't version like that, so
-just the repo name. Every `### <repo>` heading is a link to that repo's
-GitHub page (`github.com/terminalika/<repo>`) - the repo name is the link
-text, the version suffix (if any) sits outside the link.
+file names. A bump that ships with an actual tagged/published release gets
+that version in the heading (`terminalika → \`v0.6.1\``, `pi-terminalika →
+\`0.1.2\``) - bump it in place if today's section already names an older
+version; a change with no release of its own (this site's own commits,
+most days) just gets the bare repo name. Every `### <repo>` heading is a
+link to that repo's GitHub page (`github.com/terminalika/<repo>`) - the
+repo name is the link text, the version suffix (if any) sits outside the
+link.
