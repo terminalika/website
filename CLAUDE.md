@@ -77,4 +77,6 @@ Bullets are plain user-facing prose: what changed, not commit messages or
 file names. `pi-terminalika` releases get their npm version in the heading
 (`pi-terminalika → \`0.1.2\``) - bump it in place if today's section
 already names an older version; the others don't version like that, so
-just the repo name.
+just the repo name. Every `### <repo>` heading is a link to that repo's
+GitHub page (`github.com/terminalika/<repo>`) - the repo name is the link
+text, the version suffix (if any) sits outside the link.
