@@ -6,6 +6,21 @@ description: What shipped, by repository — newest first.
 Every update across the terminalika repositories, newest first, grouped by
 repository. See [development](/development/) for what each repository is.
 
+## 2026-09-03
+
+### [terminalika-core](https://github.com/terminalika/terminalika-core)
+
+- Games no longer paint their own PAUSED/GAME OVER text over the board -
+  the launcher's own notice, already shown in the agent's color, is the
+  only thing shown for a pause or game over now.
+
+### [terminalika](https://github.com/terminalika/terminalika)
+
+- Fixed the pause/agent notice flickering between its color and the board
+  underneath it: the frame is now drawn once and shown once, instead of
+  the game, the notice and the banner each flushing the screen on their
+  own.
+
 ## 2026-09-02
 
 ### [terminalika](https://github.com/terminalika/terminalika) → `v0.6.2`
