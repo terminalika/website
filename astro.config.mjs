@@ -63,35 +63,35 @@ export default defineConfig({
 				{ label: 'terminalika', slug: '' },
 				{ label: 'install', slug: 'install' },
 				{ label: 'pi extension', slug: 'pi' },
-				{ label: 'research', slug: 'research' },
-				{ label: 'changelog', slug: 'changelog' },
 				{
-					label: 'usage/',
+					label: 'the cli/',
 					items: [
 						{ label: 'flags', slug: 'usage/flags' },
 						{ label: 'config.json', slug: 'usage/config' },
 						{ label: 'keys', slug: 'usage/keys' },
 						{ label: 'games', slug: 'usage/games' },
+						{
+							label: 'agents/',
+							items: [
+								{ label: 'overview', slug: 'agents' },
+								{ label: 'claude-code', slug: 'agents/claude' },
+								{ label: 'pi (as an agent)', slug: 'agents/pi' },
+							],
+						},
+						{
+							label: 'terminals/',
+							items: [
+								{ label: 'key-releases', slug: 'terminals' },
+								{ label: 'zellij', slug: 'terminals/zellij' },
+								{ label: 'tmux', slug: 'terminals/tmux' },
+							],
+						},
+						{ label: 'events', slug: 'events' },
+						{ label: 'websocket', slug: 'websocket' },
 					],
 				},
-				{
-					label: 'agents/',
-					items: [
-						{ label: 'overview', slug: 'agents' },
-						{ label: 'claude-code', slug: 'agents/claude' },
-						{ label: 'pi', slug: 'agents/pi' },
-					],
-				},
-				{
-					label: 'terminals/',
-					items: [
-						{ label: 'key-releases', slug: 'terminals' },
-						{ label: 'zellij', slug: 'terminals/zellij' },
-						{ label: 'tmux', slug: 'terminals/tmux' },
-					],
-				},
-				{ label: 'events', slug: 'events' },
-				{ label: 'websocket', slug: 'websocket' },
+				{ label: 'research', slug: 'research' },
+				{ label: 'changelog', slug: 'changelog' },
 				{ label: 'development', slug: 'development' },
 			],
 		}),
