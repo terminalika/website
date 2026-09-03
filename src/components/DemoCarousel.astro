@@ -2,19 +2,27 @@
 /**
  * The home page's demo: the CLI capture first, the pi extension's behind
  * it - a Swiper carousel. Arrows fade in on hover (always visible on
- * touch), ←/→ work while it is in view, swiping works, and only the
- * visible video plays.
+ * touch), ←/→ work while it is in view, swiping works, only the visible
+ * video plays, and each video's `ended` event advances to the next slide
+ * (wrapping from the last back to the first) so the pair auto-cycles with
+ * no timer to desync from actual playback length. A `tag` flashes over
+ * the video for its first ~2s ("standalone", "pi-plugin") so a viewer who
+ * hasn't read the caption yet still knows which mode they're looking at.
  */
 const slides = [
 	{
 		src: '/demo.mp4',
 		name: 'cli',
+		tag: 'standalone',
+		tagColor: 'accent', // terminalika's own green
 		label: 'in the pane next to Claude Code',
 		aria: 'terminalika in the pane next to Claude Code: the game pauses the moment the agent needs you',
 	},
 	{
 		src: '/demo-pi.mp4',
 		name: 'pi plugin',
+		tag: 'pi-plugin',
+		tagColor: 'pi', // pi's own purple
 		label: '/play inside pi',
 		aria: 'terminalika inside pi: /play opens a game over the conversation, and it pauses the moment pi is waiting for you',
 	},
@@ -31,12 +39,12 @@ const slides = [
 							class="tk-demo"
 							src={s.src}
 							autoplay={i === 0}
-							loop
 							muted
 							playsinline
 							preload={i === 0 ? 'auto' : 'metadata'}
 							aria-label={s.aria}
 						/>
+						<div class={`tk-demo-tag tk-demo-tag--${s.tagColor}`} aria-hidden="true">{s.tag}</div>
 					</div>
 				))
 			}
@@ -63,7 +71,7 @@ const slides = [
 		const videos = [...el.querySelectorAll<HTMLVideoElement>('video')];
 		const names = [...el.querySelectorAll<HTMLElement>('.swiper-slide')].map((s) => s.dataset.name ?? '');
 
-		new Swiper(el, {
+		const swiper = new Swiper(el, {
 			modules: [Navigation, Keyboard, Pagination, A11y],
 			slidesPerView: 1,
 			speed: 350,
@@ -78,11 +86,11 @@ const slides = [
 			},
 			keyboard: { enabled: true, onlyInViewport: true },
 			on: {
-				slideChange(swiper) {
-					const active = swiper.slides[swiper.activeIndex] as HTMLElement;
+				slideChange(sw) {
+					const active = sw.slides[sw.activeIndex] as HTMLElement;
 					label.textContent = active.dataset.label ?? '';
 					videos.forEach((v, i) => {
-						if (i === swiper.activeIndex) {
+						if (i === sw.activeIndex) {
 							v.currentTime = 0;
 							v.play().catch(() => {});
 						} else {
@@ -91,6 +99,15 @@ const slides = [
 					});
 				},
 			},
+		});
+
+		// Auto-advance: the visible video ending moves to the next slide,
+		// wrapping back to the first - no timer, so it never drifts out of
+		// sync with how long a video actually runs.
+		videos.forEach((v, i) => {
+			v.addEventListener('ended', () => {
+				swiper.slideTo((i + 1) % videos.length);
+			});
 		});
 	}
 </script>

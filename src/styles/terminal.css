@@ -48,6 +48,10 @@
 	--tk-error-low: rgba(255, 107, 107, 0.12);
 	--tk-info: #7fd1ff;
 	--tk-info-low: rgba(127, 209, 255, 0.12);
+	/* pi's own colour elsewhere in the ecosystem (the games' in-terminal
+	   notice for a pi event is tcell's indigo) - narrow use: labelling pi
+	   by its own colour outside a terminal, e.g. the home demo's tag. */
+	--tk-pi-purple: #b18aff;
 	--tk-scanline: rgba(255, 255, 255, 0.015);
 	--tk-selection-bg: #5af78e;
 	--tk-selection-fg: #0b0e0c;
@@ -73,6 +77,7 @@
 	--tk-error-low: rgba(179, 38, 30, 0.12);
 	--tk-info: #0b6aa3;
 	--tk-info-low: rgba(11, 106, 163, 0.12);
+	--tk-pi-purple: #5e2ca5;
 	--tk-scanline: rgba(0, 0, 0, 0.02);
 	--tk-selection-bg: #1e7a3c;
 	--tk-selection-fg: #f6f8f4;
@@ -99,6 +104,7 @@
 		--tk-error-low: rgba(179, 38, 30, 0.12);
 		--tk-info: #0b6aa3;
 		--tk-info-low: rgba(11, 106, 163, 0.12);
+		--tk-pi-purple: #5e2ca5;
 		--tk-scanline: rgba(0, 0, 0, 0.02);
 		--tk-selection-bg: #1e7a3c;
 		--tk-selection-fg: #f6f8f4;
@@ -395,6 +401,61 @@ body::before {
 .tk-carousel .tk-demo {
 	margin: 0;
 	border: 0;
+}
+/* The "standalone" / "pi-plugin" tag that flashes over a slide's video
+   for its first couple of seconds - text-shadow layered in the page's
+   own background colour stands in for a scrim, so it reads over any
+   frame of either video without a new translucent-fill token. Restarts
+   on its own each time a slide re-becomes active, since that is when
+   .swiper-slide-active newly starts matching and the animation applies
+   fresh - no JS retrigger needed. */
+.tk-demo-tag {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	pointer-events: none;
+	font-family: var(--tk-font-display);
+	font-size: clamp(1.5rem, 6vw, 2.75rem);
+	letter-spacing: 0.04em;
+	color: var(--tk-fg);
+	text-shadow:
+		0 0 0.6rem var(--tk-bg),
+		0 0 0.6rem var(--tk-bg),
+		0.06em 0 0 var(--tk-bg),
+		-0.06em 0 0 var(--tk-bg),
+		0 0.06em 0 var(--tk-bg),
+		0 -0.06em 0 var(--tk-bg);
+	opacity: 0;
+}
+/* Each demo tagged in the colour that agent already wears elsewhere in
+   the ecosystem: terminalika's own accent for the standalone CLI, pi's
+   purple for the extension. */
+.tk-demo-tag--accent {
+	color: var(--tk-accent);
+}
+.tk-demo-tag--pi {
+	color: var(--tk-pi-purple);
+}
+.swiper-slide-active .tk-demo-tag {
+	animation: tk-demo-tag-flash 2.2s ease both;
+}
+@keyframes tk-demo-tag-flash {
+	0% {
+		opacity: 0;
+		transform: scale(0.97);
+	}
+	14% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	58% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
 }
 .tk-carousel .swiper-button-prev,
 .tk-carousel .swiper-button-next {
