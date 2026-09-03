@@ -21,6 +21,24 @@ repository. See [development](/development/) for what each repository is.
   the game, the notice and the banner each flushing the screen on their
   own.
 
+### [terminalika](https://github.com/terminalika/terminalika) → `v0.6.4`
+
+- The home screen's hero art slides into place noticeably faster now - a
+  snappier landing instead of the previous, slower ease.
+
+### [opencode-play](https://github.com/terminalika/opencode-play) → `v0.1.1`
+
+- A running game now pauses (or parks/settles, per your setting) the
+  moment opencode needs you for a permission or a question, not just once
+  the agent's fully done - previously only `session.idle` triggered it.
+- A parked game now shows in the footer hint, both on the home screen and
+  next to the prompt once a session's started, so it's never forgotten
+  off-screen.
+- The auto-pause preference is now asked right when the plugin loads,
+  instead of waiting for your first `/play`. Dismissing the dialog
+  without picking defaults to pausing - the option is now labeled
+  "(default)".
+
 ### [website](https://github.com/terminalika/website)
 
 - Updated both home page demo videos.
