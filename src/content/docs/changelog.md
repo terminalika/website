@@ -6,6 +6,19 @@ description: What shipped, by repository — newest first.
 Every update across the terminalika repositories, newest first, grouped by
 repository. See [development](/development/) for what each repository is.
 
+## 2026-09-04
+
+### [opencode-play](https://github.com/terminalika/opencode-play)
+
+- The README now leads with a demo gif, matching pi-play's.
+
+### [website](https://github.com/terminalika/website)
+
+- The home demo carousel gained a third slide: opencode-play, alongside
+  the CLI and the pi plugin, tagged "opencode-plugin" in a new blue drawn
+  just for it - opencode's own brand is grayscale, so its tag borrows the
+  hue instead of reusing it.
+
 ## 2026-09-03
 
 ### [terminalika-core](https://github.com/terminalika/terminalika-core) → `v0.7.1`

@@ -52,6 +52,10 @@
 	   notice for a pi event is tcell's indigo) - narrow use: labelling pi
 	   by its own colour outside a terminal, e.g. the home demo's tag. */
 	--tk-pi-purple: #b18aff;
+	/* opencode's own brand is grayscale, so this is a narrow use too - a
+	   blue distinct from pi's purple, just for labelling opencode outside
+	   a terminal, e.g. the home demo's tag. */
+	--tk-opencode-slate: #7db8ff;
 	--tk-scanline: rgba(255, 255, 255, 0.015);
 	--tk-selection-bg: #5af78e;
 	--tk-selection-fg: #0b0e0c;
@@ -78,6 +82,7 @@
 	--tk-info: #0b6aa3;
 	--tk-info-low: rgba(11, 106, 163, 0.12);
 	--tk-pi-purple: #5e2ca5;
+	--tk-opencode-slate: #1a63b7;
 	--tk-scanline: rgba(0, 0, 0, 0.02);
 	--tk-selection-bg: #1e7a3c;
 	--tk-selection-fg: #f6f8f4;
@@ -105,6 +110,7 @@
 		--tk-info: #0b6aa3;
 		--tk-info-low: rgba(11, 106, 163, 0.12);
 		--tk-pi-purple: #5e2ca5;
+		--tk-opencode-slate: #1a63b7;
 		--tk-scanline: rgba(0, 0, 0, 0.02);
 		--tk-selection-bg: #1e7a3c;
 		--tk-selection-fg: #f6f8f4;
@@ -437,6 +443,9 @@ body::before {
 }
 .tk-demo-tag--pi {
 	color: var(--tk-pi-purple);
+}
+.tk-demo-tag--opencode {
+	color: var(--tk-opencode-slate);
 }
 .swiper-slide-active .tk-demo-tag {
 	animation: tk-demo-tag-flash 2.2s ease both;
