@@ -8,18 +8,26 @@ repository. See [development](/development/) for what each repository is.
 
 ## 2026-09-03
 
-### [terminalika-core](https://github.com/terminalika/terminalika-core)
+### [terminalika-core](https://github.com/terminalika/terminalika-core) → `v0.7.1`
 
 - Games no longer paint their own PAUSED/GAME OVER text over the board -
   the launcher's own notice, already shown in the agent's color, is the
   only thing shown for a pause or game over now.
 
-### [terminalika](https://github.com/terminalika/terminalika)
+### [terminalika](https://github.com/terminalika/terminalika) → `v0.6.3`
 
 - Fixed the pause/agent notice flickering between its color and the board
   underneath it: the frame is now drawn once and shown once, instead of
   the game, the notice and the banner each flushing the screen on their
   own.
+
+### [website](https://github.com/terminalika/website)
+
+- Updated both home page demo videos.
+- The demo carousel now auto-advances: when a video ends it moves to the
+  other one, wrapping back to the first, instead of looping forever on
+  its own. A tag flashes over each video for its first second or so -
+  "standalone" in terminalika's own green, "pi-plugin" in pi's purple.
 
 ## 2026-09-02
 
