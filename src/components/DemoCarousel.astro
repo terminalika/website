@@ -7,7 +7,10 @@
  * (wrapping from the last back to the first) so the pair auto-cycles with
  * no timer to desync from actual playback length. A `tag` flashes over
  * the video for its first ~2s ("standalone", "pi-plugin") so a viewer who
- * hasn't read the caption yet still knows which mode they're looking at.
+ * hasn't read the caption yet still knows which mode they're looking at -
+ * the newly active video sits frozen on its first frame for that same
+ * stretch, so the game's own motion doesn't compete with the tag for
+ * attention, then plays once the tag has faded (see TAG_FLASH_MS below).
  */
 const slides = [
 	{
@@ -46,7 +49,6 @@ const slides = [
 						<video
 							class="tk-demo"
 							src={s.src}
-							autoplay={i === 0}
 							muted
 							playsinline
 							preload={i === 0 ? 'auto' : 'metadata'}
@@ -73,11 +75,29 @@ const slides = [
 	import 'swiper/css/navigation';
 	import 'swiper/css/pagination';
 
+	// Must match .tk-demo-tag-flash's animation-duration in terminal.css.
+	const TAG_FLASH_MS = 2200;
+
 	for (const root of document.querySelectorAll<HTMLElement>('.tk-carousel')) {
 		const el = root.querySelector<HTMLElement>('.tk-carousel-swiper')!;
 		const label = root.querySelector<HTMLElement>('.tk-carousel-label')!;
 		const videos = [...el.querySelectorAll<HTMLVideoElement>('video')];
 		const names = [...el.querySelectorAll<HTMLElement>('.swiper-slide')].map((s) => s.dataset.name ?? '');
+
+		let playTimer: ReturnType<typeof setTimeout> | undefined;
+
+		// Freeze the newly active video on its first frame - everyone
+		// else pauses outright - then let it play once the tag flash
+		// over it has faded. A stale timer (rapid swiping) is cancelled
+		// before it can start a video that isn't active any more.
+		function activate(index: number) {
+			clearTimeout(playTimer);
+			videos.forEach((v, i) => {
+				v.pause();
+				if (i === index) v.currentTime = 0;
+			});
+			playTimer = setTimeout(() => videos[index]?.play().catch(() => {}), TAG_FLASH_MS);
+		}
 
 		const swiper = new Swiper(el, {
 			modules: [Navigation, Keyboard, Pagination, A11y],
@@ -97,17 +117,12 @@ const slides = [
 				slideChange(sw) {
 					const active = sw.slides[sw.activeIndex] as HTMLElement;
 					label.textContent = active.dataset.label ?? '';
-					videos.forEach((v, i) => {
-						if (i === sw.activeIndex) {
-							v.currentTime = 0;
-							v.play().catch(() => {});
-						} else {
-							v.pause();
-						}
-					});
+					activate(sw.activeIndex);
 				},
 			},
 		});
+
+		activate(swiper.activeIndex);
 
 		// Auto-advance: the visible video ending moves to the next slide,
 		// wrapping back to the first - no timer, so it never drifts out of
