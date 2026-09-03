@@ -17,7 +17,10 @@ repository. See [development](/development/) for what each repository is.
 - The home demo carousel gained a third slide: opencode-play, alongside
   the CLI and the pi plugin, tagged "opencode-plugin" in a new blue drawn
   just for it - opencode's own brand is grayscale, so its tag borrows the
-  hue instead of reusing it.
+  hue instead of reusing it. Re-recorded with a cleaner take since.
+- Each slide now holds on its first frame while its tag flashes over it,
+  instead of playing right away - the game's own motion no longer
+  competes with the tag for attention. It starts once the tag has faded.
 
 ## 2026-09-03
 
