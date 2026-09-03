@@ -21,6 +21,11 @@ repository. See [development](/development/) for what each repository is.
 - Each slide now holds on its first frame while its tag flashes over it,
   instead of playing right away - the game's own motion no longer
   competes with the tag for attention. It starts once the tag has faded.
+- Fixed the Cloudflare deploy: without a committed Wrangler config,
+  `wrangler deploy` tried to auto-configure the project for Cloudflare
+  itself, pulling in an SSR adapter that didn't build against this
+  project's pinned Astro version. A `wrangler.jsonc` now just tells it to
+  serve the prebuilt static `dist/` directly.
 
 ## 2026-09-03
 
